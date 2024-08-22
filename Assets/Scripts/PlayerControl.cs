@@ -7,13 +7,16 @@ public class PlayerControl : MonoBehaviour
 {
     //Movement vars
     Vector2 destination = new Vector2(0,0);
-    Vector2 direction = new Vector2(0,0);
+    Vector2 moveDirection = new Vector2(0,0);
+    Vector2 faceDirection = new Vector2(0, 0);
     bool canMove = true;
     bool isMoving = false;
 
     float rayDistance = 1.0f;  // Raycast distance
     LayerMask wallLayer;       // wall layer
     LayerMask boxLayer;        // box layer
+
+    int score = 0;
 
     void Start()
     {
@@ -32,36 +35,38 @@ public class PlayerControl : MonoBehaviour
         //move logic
         if (canMove && !isMoving)
         {
-            direction = Vector2.zero;
+            moveDirection = Vector2.zero;
 
             //user input
             if (Input.GetAxis("Horizontal") >= 0.2f)
             {
-                direction = Vector2.right;
+                moveDirection = Vector2.right;
             }
             else if (Input.GetAxis("Horizontal") <= -0.2f)
             {
-                direction = Vector2.left;
+                moveDirection = Vector2.left;
             }
             else if (Input.GetAxis("Vertical") >= 0.2f)
             {
-                direction = Vector2.up;
+                moveDirection = Vector2.up;
             }
             else if (Input.GetAxis("Vertical") <= -0.2f)
             {
-                direction = Vector2.down;
+                moveDirection = Vector2.down;
             }
 
             //if there is a input
-            if (direction != Vector2.zero)
+            if (moveDirection != Vector2.zero)
             {
+                faceDirection = moveDirection; //for push box checking and future animation
+
                 // Raycast to check the wall
-                RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, rayDistance, wallLayer);
+                RaycastHit2D hit = Physics2D.Raycast(transform.position, moveDirection, rayDistance, wallLayer | boxLayer);
 
                 if (hit.collider == null)
                 {
                     // no wall, can move
-                    destination += direction;
+                    destination += moveDirection;
                     canMove = false;
                     isMoving = true;
                     StartCoroutine("moving");
@@ -72,8 +77,14 @@ public class PlayerControl : MonoBehaviour
         //push the box/////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            //TODO
-            Debug.Log("Pressed Push");
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, faceDirection, rayDistance, boxLayer);
+
+            if (hit.collider != null)
+            {
+                BoxControl hitObjectControl = hit.collider.gameObject.GetComponent<BoxControl>();
+                hitObjectControl.isPushed = true;
+                hitObjectControl.moveDirection = faceDirection;
+            }
         }
 
     }
@@ -90,6 +101,16 @@ public class PlayerControl : MonoBehaviour
         if (isMoving)
         {
             destination = new Vector2(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y));
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Pickup")
+        {
+            Destroy(collision.gameObject);
+            score += 100;
+            Debug.Log("Score: " + score);
         }
     }
 

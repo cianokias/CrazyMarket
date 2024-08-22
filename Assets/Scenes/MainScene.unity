@@ -837,6 +837,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3900244095594347226, guid: 45cdcc226aaf7a7449b769e5b247df34, type: 3}
+      propertyPath: isSpecialBox
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5855771532313643222, guid: 45cdcc226aaf7a7449b769e5b247df34, type: 3}
       propertyPath: m_Name
       value: Box (2)
@@ -3887,6 +3891,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3900244095594347226, guid: 45cdcc226aaf7a7449b769e5b247df34, type: 3}
+      propertyPath: isSpecialBox
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5855771532313643222, guid: 45cdcc226aaf7a7449b769e5b247df34, type: 3}
       propertyPath: m_Name
       value: Box (3)

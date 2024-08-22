@@ -112,6 +112,13 @@ public class PlayerControl : MonoBehaviour
             score += 100;
             Debug.Log("Score: " + score);
         }
+
+        if (collision.gameObject.tag == "PowerUp")
+        {
+            Destroy(collision.gameObject);
+            score += 100;
+            Debug.Log("Score: " + score + " , and a power up!");
+        }
     }
 
 }

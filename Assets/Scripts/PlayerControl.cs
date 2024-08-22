@@ -22,6 +22,12 @@ public class PlayerControl : MonoBehaviour
     {
         wallLayer = LayerMask.GetMask("Wall");
         boxLayer = LayerMask.GetMask("Box");
+        destination = transform.position;
+    }
+
+    private void OnEnable()
+    {
+        destination = transform.position;
     }
 
     void Update()
@@ -33,7 +39,7 @@ public class PlayerControl : MonoBehaviour
         if ((Vector2)transform.position == destination) { isMoving = false; }
 
         //move logic
-        if (canMove && !isMoving)
+        if (canMove && !isMoving && !Game.Control.recovering)
         {
             moveDirection = Vector2.zero;
 
@@ -118,6 +124,15 @@ public class PlayerControl : MonoBehaviour
             Destroy(collision.gameObject);
             score += 100;
             Debug.Log("Score: " + score + " , and a power up!");
+        }
+
+        if (collision.gameObject.tag == "NPC")
+        {
+            Game.Control.health -= 1;
+            if (Game.Control.health == 0)
+            {
+                Game.Control.resetPlayer();
+            }
         }
     }
 

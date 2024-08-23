@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Pickup
+  - Boundary
+  - NPC
+  - Box
   layers:
   - Default
   - TransparentFX

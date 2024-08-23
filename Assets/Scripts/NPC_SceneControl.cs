@@ -15,6 +15,7 @@ public class NPC_SceneControl : MonoBehaviour
     public float NPC_Speed=2;
 
     public int[,] MapInfo;
+
     // Start is called before the first frame update
     void Start()
     {

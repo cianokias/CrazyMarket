@@ -11,10 +11,16 @@ public class Game : MonoBehaviour
     public int health = 4;
     public bool secondLife = false;
     public bool recovering = false;
+    public Vector2 startPoint = Vector2.zero;
 
     private void Awake()
     {
         Control = this;
+    }
+
+    private void Start()
+    {
+        startPoint = player.transform.position;
     }
 
     public void resetPlayer()
@@ -30,7 +36,7 @@ public class Game : MonoBehaviour
         health = 4;
         secondLife = true;
         yield return new WaitForSeconds(1.0f);
-        player.transform.position = new Vector2(0,0);
+        player.transform.position = startPoint;
         yield return new WaitForSeconds(2.0f);
         player.SetActive(true);
         recovering = false;

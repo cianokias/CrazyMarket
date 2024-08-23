@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 3f001dea1df594548a5e594827d404c4
+guid: 620995c87417d904dadd7dad7ddfccfb
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,10 +9,10 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - IPix
+  - LGGothic
   fallbackFontReferences: []
   customCharacters: 
-  fontRenderingMode: 0
+  fontRenderingMode: 2
   ascentCalculationMode: 1
   useLegacyBoundsCalculation: 0
   shouldRoundAdvanceValue: 1

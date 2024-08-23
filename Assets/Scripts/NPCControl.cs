@@ -154,7 +154,7 @@ public class NPCContol : MonoBehaviour
 
     private void NPCThought()//敌人思考去哪里
     {
-        if (NPC_SceneControl.NPC_Scene.player is not null)
+        if (NPC_SceneControl.NPC_Scene.player.activeSelf)
         {
             Vector2Int playerPos = new Vector2Int((int)(NPC_SceneControl.NPC_Scene.player.transform.position.x+0.5), (int)(NPC_SceneControl.NPC_Scene.player.transform.position.y + 0.5));
             destination = AStarPathFind(playerPos);
@@ -166,7 +166,7 @@ public class NPCContol : MonoBehaviour
         
         for (int i = 0; i < NPC_SceneControl.NPC_Scene.obj_trans.childCount; i++) 
         {
-            if (NPC_SceneControl.NPC_Scene.obj_trans.GetChild(i).tag == "PickUp")
+            if (NPC_SceneControl.NPC_Scene.obj_trans.GetChild(i).tag == "Pickup")
             {
                 if (Vector2.Distance(NPC_SceneControl.NPC_Scene.obj_trans.GetChild(i).position, transform.position) < nearPickupDis)
                 {

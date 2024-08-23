@@ -5,14 +5,18 @@ using UnityEngine;
 
 public class BoxControl : MonoBehaviour
 {
+    [Header("Setting")]
+    public bool isSpecialBox = false;
+    public GameObject pickup;
+    public GameObject powerup;
+
+    [Header("DontCare")]
     public bool isPushed = false;
     bool triggered = false;
     bool opened = false;
 
     public Vector2 moveDirection = new Vector2 (0, 0);
     Vector2 destination;
-
-    public GameObject pickup;
 
     LayerMask wallLayer;
     LayerMask boxLayer;
@@ -22,6 +26,13 @@ public class BoxControl : MonoBehaviour
         destination = transform.position;
         wallLayer = LayerMask.GetMask("Wall");
         boxLayer = LayerMask.GetMask("Box");
+
+        //special box change sprite
+        //todo
+        if (isSpecialBox)
+        {
+            GetComponent<SpriteRenderer>().color = Color.gray;
+        }
     }
 
     void Update()
@@ -32,7 +43,7 @@ public class BoxControl : MonoBehaviour
             destination += moveDirection * 20;
         }
 
-        transform.position = Vector2.MoveTowards(transform.position, destination, 5 * Time.deltaTime);
+        transform.position = Vector2.MoveTowards(transform.position, destination, 10 * Time.deltaTime);
 
         if (isPushed && !opened)
         {
@@ -51,7 +62,16 @@ public class BoxControl : MonoBehaviour
         destination = new Vector2(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y));
         yield return new WaitForSeconds(0.2f);
         GetComponent<SpriteRenderer>().enabled = false;
-        Instantiate(pickup, transform.position, pickup.transform.rotation);
+
+        if (isSpecialBox)
+        {
+            Instantiate(powerup, transform.position, powerup.transform.rotation);
+        }
+        else 
+        {
+            Instantiate(pickup, transform.position, pickup.transform.rotation);
+        }
+        
         yield return new WaitForSeconds(0.2f);
         Destroy(this.gameObject);
     }

@@ -16,8 +16,6 @@ public class PlayerControl : MonoBehaviour
     LayerMask wallLayer;       // wall layer
     LayerMask boxLayer;        // box layer
 
-    int score = 0;
-
     void Start()
     {
         wallLayer = LayerMask.GetMask("Wall");
@@ -115,15 +113,14 @@ public class PlayerControl : MonoBehaviour
         if (collision.gameObject.tag == "Pickup")
         {
             Destroy(collision.gameObject);
-            score += 100;
-            Debug.Log("Score: " + score);
+            Game.Control.updateScore(100);
         }
 
         if (collision.gameObject.tag == "PowerUp")
         {
             Destroy(collision.gameObject);
-            score += 100;
-            Debug.Log("Score: " + score + " , and a power up!");
+            Game.Control.updateScore(100);
+            Debug.Log("a power up!");
         }
 
         if (collision.gameObject.tag == "NPC")

@@ -81,6 +81,7 @@ public class BoxControl : MonoBehaviour
         if (isPushed && collision.gameObject.tag == "NPC")
         {
             // TODO: NPC HP--
+            collision.GetComponent<NPCContol>().health--;
         }
     }
 }

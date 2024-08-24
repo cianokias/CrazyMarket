@@ -24,9 +24,20 @@ public class Game : MonoBehaviour
 
     int timer = 60;
 
+    [Header("Map Info")]
+    public int[,] mapInfo;
+    public int mapHeight, mapWidth;//Boundary included
+    public GameObject objs;
+
     private void Awake()
     {
         Control = this;
+        //Setting the map size. Should be manually set if need to auto generate map 
+        var bound = GameObject.Find("Boundary");
+        mapHeight =(int) (bound.transform.Find("H UP").GetChild(0).position.y - bound.transform.Find("H Down").GetChild(0).position.y)+1;
+        mapWidth = (int)(bound.transform.Find("V Right").GetChild(0).position.x - bound.transform.Find("V Left").GetChild(0).position.x)+1;
+        mapInfo = new int[mapWidth,mapHeight];
+        RefreshMapInfo();
     }
 
     private void Start()
@@ -70,6 +81,7 @@ public class Game : MonoBehaviour
 
     private void Update()
     {
+        RefreshMapInfo();
         //test only, press F to HP--
         if (Input.GetKeyDown(KeyCode.F))
         {
@@ -88,6 +100,45 @@ public class Game : MonoBehaviour
                 Time.timeScale = 1f;
                 SceneManager.LoadScene(0);
             }
+        }
+
+    }
+
+    void RefreshMapInfo()
+    {
+        //Reset MapInfo
+        for (int i = 0; i < mapHeight; i++) 
+        {
+            for (int j = 0; j < mapWidth; j++)
+            {
+                mapInfo[j, i] = 0;
+            }
+        }
+        //Add the Boundary
+        var boundary = GameObject.Find("Boundary").transform;
+        for (int i = 0;i < boundary.childCount; i++)
+        {
+            for(int j = 0; j < boundary.GetChild(i).childCount; j++)
+            {
+                int x = (int)boundary.GetChild(i).GetChild(j).transform.position.x, y = (int)boundary.GetChild(i).GetChild(j).transform.position.y;
+                mapInfo[x, y] = 19260817;
+            }
+            
+        }
+
+        var objs = GameObject.Find("Objects").transform;
+        for (int i = 0; i < objs.childCount; i++)
+        {
+            int x = (int)objs.GetChild(i).transform.position.x, y = (int)objs.GetChild(i).transform.position.y;
+            if (objs.GetChild(i).tag == "Box")
+            {
+                mapInfo[x, y] = 114;
+            }
+            else if (objs.GetChild(i).tag == "Pickup")
+            {
+                mapInfo[x, y] = 0;
+            }
+            
         }
 
     }

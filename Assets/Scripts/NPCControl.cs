@@ -7,6 +7,9 @@ using UnityEngine.Android;
 
 public class NPCContol : MonoBehaviour
 {
+    public float speed = 1.5f;
+    public int health = 1;
+    public int score = 0;
 
     List<Vector3> astarPath;
     //Movement vars
@@ -15,13 +18,13 @@ public class NPCContol : MonoBehaviour
     Vector2 faceDirection = new Vector2(0, 0);
     bool canMove = true;
     bool isMoving=false;
+    bool blocked = false;
 
     float rayDistance = 1.0f;  // Raycast distance
     LayerMask wallLayer;       // wall layer
     LayerMask boxLayer;        // box layer
 
-    int score = 0;
-    int health = 1;
+   
     void Start()
     {
         wallLayer = LayerMask.GetMask("Wall");
@@ -52,8 +55,13 @@ public class NPCContol : MonoBehaviour
                 return;
             }
             isMoving = true;
-            transform.position= Vector2.MoveTowards(transform.position, destination, NPC_SceneControl.NPC_Scene.NPC_Speed * Time.deltaTime);
+            transform.position= Vector2.MoveTowards(transform.position, destination, speed * Time.deltaTime);
 
+        }
+
+        if (health<=0)
+        {
+            Die();
         }
 
         /*
@@ -157,26 +165,50 @@ public class NPCContol : MonoBehaviour
         }
     }
 
+    private void Die()
+    {
+        Destroy(gameObject);
+    }
+
     private void NPCThought()//敌人思考去哪里
     {
-        if (NPC_SceneControl.NPC_Scene.player.activeSelf)
+        List<Vector2Int> direction = new List<Vector2Int>() { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+        if (blocked)//check if is not blocked anymore
         {
-            Vector2Int playerPos = new Vector2Int((int)(NPC_SceneControl.NPC_Scene.player.transform.position.x+0.5), (int)(NPC_SceneControl.NPC_Scene.player.transform.position.y + 0.5));
+            for (int i = 0; i < 4; i++) 
+            {
+                var checkpos = new Vector2Int((int)(transform.position.x + 0.5), (int)(transform.position.y + 0.5)) + direction[i];
+                if (Game.Control.mapInfo[checkpos.x, checkpos.y] == 0)
+                {
+                    blocked = false;
+                    break;
+                }
+            }
+        }
+
+        if (blocked)//if blocked, abandon all thoughts and become Kazi Sama
+            return;
+
+        //if player alive, chase player
+        if (Game.Control.player.activeSelf)
+        {
+            Vector2Int playerPos = new Vector2Int((int)(Game.Control.player.transform.position.x+0.5), (int)(Game.Control.player.transform.position.y + 0.5));
             destination = AStarPathFind(playerPos);
             return;
         }
 
+        //if no player, find nearest pickup
         float nearPickupDis = 19260817;
         Vector2Int pickupPos = new Vector2Int();
         
-        for (int i = 0; i < NPC_SceneControl.NPC_Scene.obj_trans.childCount; i++) 
+        for (int i = 0; i < Game.Control.objs.transform.childCount; i++) 
         {
-            if (NPC_SceneControl.NPC_Scene.obj_trans.GetChild(i).tag == "Pickup")
+            if (Game.Control.objs.transform.GetChild(i).tag == "Pickup")
             {
-                if (Vector2.Distance(NPC_SceneControl.NPC_Scene.obj_trans.GetChild(i).position, transform.position) < nearPickupDis)
+                if (Vector2.Distance(Game.Control.objs.transform.GetChild(i).position, transform.position) < nearPickupDis)
                 {
-                    nearPickupDis = Vector2.Distance(NPC_SceneControl.NPC_Scene.obj_trans.GetChild(i).position, transform.position);
-                    pickupPos =new Vector2Int((int)(NPC_SceneControl.NPC_Scene.obj_trans.GetChild(i).position.x+0.5), (int)(NPC_SceneControl.NPC_Scene.obj_trans.GetChild(i).position.y + 0.5)) ;
+                    nearPickupDis = Vector2.Distance(Game.Control.objs.transform.GetChild(i).position, transform.position);
+                    pickupPos =new Vector2Int((int)(Game.Control.objs.transform.GetChild(i).position.x+0.5), (int)(Game.Control.objs.transform.GetChild(i).position.y + 0.5)) ;
                 }
             }
         }
@@ -187,9 +219,22 @@ public class NPCContol : MonoBehaviour
             return;
         }
 
+        //if nothing to chase, randomly move around
         int d = Random.Range(0, 4);
-        List<Vector2Int> direction = new List<Vector2Int>() { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+        
         destination = new Vector2Int((int)(transform.position.x+0.5), (int)(transform.position.y + 0.5)) + direction[d];
+        int loop = 0;
+        while (Game.Control.mapInfo[(int)destination.x, (int)destination.y] >0 && loop < 6)
+        {
+            loop++;
+            d = (d + 1) % 4;
+            destination = new Vector2Int((int)(transform.position.x + 0.5), (int)(transform.position.y + 0.5)) + direction[d];
+        }
+        if (loop >= 6)
+        {
+            destination = transform.position;
+            blocked = false;
+        }
     }
 
     private class Node
@@ -231,7 +276,7 @@ public class NPCContol : MonoBehaviour
             {
                 continue;
             }
-            else if (NPC_SceneControl.NPC_Scene.MapInfo[x,y]>0)
+            else if (Game.Control.mapInfo[x,y]>0)
             {
                 continue;
             }
@@ -266,7 +311,7 @@ public class NPCContol : MonoBehaviour
                 {
                     continue;
                 }
-                else if (NPC_SceneControl.NPC_Scene.MapInfo[x, y] > 0)
+                else if (Game.Control.mapInfo[x, y] > 0)//检测是否有障碍物
                 {
                     continue;
                 }
@@ -335,7 +380,6 @@ public class NPCContol : MonoBehaviour
             replayNode = replayNode.parent;
         }
 
-        Debug.Log(log);
         return replayNode.pos;
     }
 }

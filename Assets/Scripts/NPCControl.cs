@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Android;
@@ -20,7 +21,7 @@ public class NPCContol : MonoBehaviour
     LayerMask boxLayer;        // box layer
 
     int score = 0;
-
+    int health = 1;
     void Start()
     {
         wallLayer = LayerMask.GetMask("Wall");
@@ -54,7 +55,6 @@ public class NPCContol : MonoBehaviour
             transform.position= Vector2.MoveTowards(transform.position, destination, NPC_SceneControl.NPC_Scene.NPC_Speed * Time.deltaTime);
 
         }
-
 
         /*
          //move to destination
@@ -118,6 +118,11 @@ public class NPCContol : MonoBehaviour
             }
         }
         */
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        
     }
 
     IEnumerator stoping()

@@ -21,13 +21,15 @@ public class Game : MonoBehaviour
     public TMP_Text scoreText;
     public TMP_Text healthText;
     public TMP_Text timerText;
+    public GameObject NPC;
+
+    [Header("MapInfo")]
+    public int mapHeight;
+    public int mapWidth;//Boundary included
+    public GameObject objs;
+    public int[,] mapInfo;
 
     int timer = 60;
-
-    [Header("Map Info")]
-    public int[,] mapInfo;
-    public int mapHeight, mapWidth;//Boundary included
-    public GameObject objs;
 
     private void Awake()
     {
@@ -57,7 +59,7 @@ public class Game : MonoBehaviour
         recovering = true;
         player.SetActive(false);
         health = 4;
-        healthText.text = "HP " + health.ToString();
+        updateHealth(0);
         scoreText.text = "LAST CHANCE";
         secondLife = true;
         yield return new WaitForSeconds(1.0f);
@@ -76,6 +78,10 @@ public class Game : MonoBehaviour
             timer -= 1;
             timerText.text = timer.ToString("00");
             if (timer <= 0) { gameEnd(); }
+            if (timer % 10 == 0)
+            {
+                Instantiate(NPC, startPoint, NPC.transform.rotation);
+            }
         }
     }
 
@@ -85,8 +91,7 @@ public class Game : MonoBehaviour
         //test only, press F to HP--
         if (Input.GetKeyDown(KeyCode.F))
         {
-            health -= 1;
-            healthText.text = "HP " + health.ToString();
+            updateHealth(-1);
             if (health == 0)
             {
                 resetPlayer();
@@ -154,5 +159,11 @@ public class Game : MonoBehaviour
     { 
         score += scoreToAdd;
         scoreText.text = "SCORE " + score.ToString("00000");
+    }
+
+    public void updateHealth(int healthToAdd)
+    {
+        health += healthToAdd;
+        healthText.text = "HP " + health.ToString();
     }
 }

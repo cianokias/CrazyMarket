@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using UnityEngine.SceneManagement;
 
 public class Game : MonoBehaviour
 {
@@ -9,17 +11,33 @@ public class Game : MonoBehaviour
     [Header("Player Status")]
     public GameObject player;
     public int health = 4;
+    public int score = 0;
     public bool secondLife = false;
     public bool recovering = false;
+    public bool gameOver = false;
+    public Vector2 startPoint = Vector2.zero;
+
+    [Header("GameObjects")]
+    public TMP_Text scoreText;
+    public TMP_Text healthText;
+    public TMP_Text timerText;
+
+    int timer = 60;
 
     private void Awake()
     {
         Control = this;
     }
 
+    private void Start()
+    {
+        startPoint = player.transform.position;
+        StartCoroutine("StartTimer");
+    }
+
     public void resetPlayer()
     {
-        if (secondLife) { gameOver(); return;}
+        if (secondLife) { gameEnd(); return;}
         StartCoroutine("anotherChance");
     }
 
@@ -28,30 +46,62 @@ public class Game : MonoBehaviour
         recovering = true;
         player.SetActive(false);
         health = 4;
+        healthText.text = "HP " + health.ToString();
+        scoreText.text = "LAST CHANCE";
         secondLife = true;
         yield return new WaitForSeconds(1.0f);
-        player.transform.position = new Vector2(0,0);
+        player.transform.position = startPoint;
         yield return new WaitForSeconds(2.0f);
         player.SetActive(true);
         recovering = false;
+        updateScore(0);
     }
 
-    //test only
+    IEnumerator StartTimer()
+    {
+        while (!gameOver)
+        {
+            yield return new WaitForSeconds(1.0f);
+            timer -= 1;
+            timerText.text = timer.ToString("00");
+            if (timer <= 0) { gameEnd(); }
+        }
+    }
+
     private void Update()
     {
+        //test only, press F to HP--
         if (Input.GetKeyDown(KeyCode.F))
         {
-            health -=1;
+            health -= 1;
+            healthText.text = "HP " + health.ToString();
             if (health == 0)
             {
                 resetPlayer();
             }
+        }//
+
+        if (gameOver)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Time.timeScale = 1f;
+                SceneManager.LoadScene(0);
+            }
         }
+
     }
 
-    void gameOver()
+    void gameEnd()
     {
-        //todo
+        healthText.text = "GAME OVER";
+        gameOver = true;
+        Time.timeScale = 0f;
     }
 
+    public void updateScore(int scoreToAdd)
+    { 
+        score += scoreToAdd;
+        scoreText.text = "SCORE " + score.ToString("00000");
+    }
 }

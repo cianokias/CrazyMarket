@@ -75,4 +75,12 @@ public class BoxControl : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         Destroy(this.gameObject);
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (isPushed && collision.gameObject.tag == "NPC")
+        {
+            // TODO: NPC HP--
+        }
+    }
 }

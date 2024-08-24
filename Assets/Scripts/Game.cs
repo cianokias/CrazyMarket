@@ -20,6 +20,9 @@ public class Game : MonoBehaviour
     [Header("GameObjects")]
     public TMP_Text scoreText;
     public TMP_Text healthText;
+    public TMP_Text timerText;
+
+    int timer = 60;
 
     private void Awake()
     {
@@ -29,6 +32,7 @@ public class Game : MonoBehaviour
     private void Start()
     {
         startPoint = player.transform.position;
+        StartCoroutine("StartTimer");
     }
 
     public void resetPlayer()
@@ -51,6 +55,17 @@ public class Game : MonoBehaviour
         player.SetActive(true);
         recovering = false;
         updateScore(0);
+    }
+
+    IEnumerator StartTimer()
+    {
+        while (!gameOver)
+        {
+            yield return new WaitForSeconds(1.0f);
+            timer -= 1;
+            timerText.text = timer.ToString("00");
+            if (timer <= 0) { gameEnd(); }
+        }
     }
 
     private void Update()

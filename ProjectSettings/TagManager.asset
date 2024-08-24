@@ -3,23 +3,15 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - Pickup
-<<<<<<< HEAD
-  - Boundary
-  - NPC
-  - Box
-=======
-  - PowerUp
->>>>>>> acb39ea4c95cb8ef89c9bc70cf4bfef516c1d5fb
+  tags: []
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Wall
+  - 
   - Water
   - UI
-  - Box
+  - 
   - 
   - 
   - 

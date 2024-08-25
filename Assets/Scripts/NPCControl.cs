@@ -157,7 +157,7 @@ public class NPCContol : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Pickup")
+        if (collision.gameObject.tag == "Pickup" && Game.Control.recovering)
         {
             Destroy(collision.gameObject);
             score += 100;

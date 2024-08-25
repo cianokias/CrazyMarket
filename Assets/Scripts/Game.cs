@@ -80,7 +80,8 @@ public class Game : MonoBehaviour
             if (timer <= 0) { gameEnd(); }
             if (timer % 10 == 0)
             {
-                Instantiate(NPC, startPoint, NPC.transform.rotation);
+
+                Instantiate(NPC, new Vector3(player.transform.position.x >= 8 ? 1 : 15, player.transform.position.y >= 7 ? 1 : 13), NPC.transform.rotation);
             }
         }
     }

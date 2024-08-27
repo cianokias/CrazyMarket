@@ -6,9 +6,11 @@ using UnityEngine;
 public class BoxControl : MonoBehaviour
 {
     [Header("Setting")]
-    public bool isSpecialBox = false;
-    public GameObject pickup;
+    //public bool isSpecialBox = false;
+    public int boxType = 0;
+    public GameObject[] pickup;
     public GameObject powerup;
+    public Sprite[] boxSprites;
 
     [Header("DontCare")]
     public bool isPushed = false;
@@ -21,6 +23,28 @@ public class BoxControl : MonoBehaviour
     LayerMask wallLayer;
     LayerMask boxLayer;
 
+    SpriteRenderer sr;
+
+    private void OnValidate()
+    {
+        sr = GetComponent<SpriteRenderer>();
+        switch (GetComponent<BoxControl>().boxType)
+        {
+            case 0:
+                sr.sprite = boxSprites[0];
+                break;
+            case 1:
+                sr.sprite = boxSprites[1];
+                break;
+            case 2:
+                sr.sprite = boxSprites[2];
+                break;
+            case 3:
+                sr.sprite = boxSprites[3];
+                break;
+        }
+    }
+
     void Start()
     {
         destination = transform.position;
@@ -28,13 +52,29 @@ public class BoxControl : MonoBehaviour
         boxLayer = LayerMask.GetMask("Box");
 
         //set box orderInLayer
-        GetComponent<SpriteRenderer>().sortingOrder = 14 - (int)transform.position.y;
+        sr = GetComponent<SpriteRenderer>();
+        sr.sortingOrder = 14 - (int)transform.position.y;
 
         //special box change sprite
-        //todo
-        if (isSpecialBox)
+        /*if (isSpecialBox)
         {
             GetComponent<SpriteRenderer>().color = Color.gray;
+        }*/
+        switch (boxType)
+        {
+            case 0:
+                sr.sprite = boxSprites[0];
+                break;
+            case 1:
+                sr.sprite = boxSprites[1];
+                break;
+            case 2:
+                sr.sprite = boxSprites[2];
+                break;
+            case 3:
+                sr.sprite = boxSprites[3];
+                break;
+
         }
     }
 
@@ -66,15 +106,31 @@ public class BoxControl : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         GetComponent<SpriteRenderer>().enabled = false;
 
-        if (isSpecialBox)
+        /*if (isSpecialBox)
         {
             Instantiate(powerup, transform.position, powerup.transform.rotation);
         }
         else 
         {
             Instantiate(pickup, transform.position, pickup.transform.rotation);
+        }*/
+        switch (boxType)
+        {
+            case 0:
+                Instantiate(pickup[0], transform.position, pickup[0].transform.rotation);
+                break;
+            case 1:
+                Instantiate(pickup[1], transform.position, pickup[1].transform.rotation);
+                break;
+            case 2:
+                Instantiate(pickup[2], transform.position, pickup[2].transform.rotation);
+                break;
+            case 3:
+                Instantiate(powerup, transform.position, powerup.transform.rotation);
+                break;
+
         }
-        
+
         yield return new WaitForSeconds(0.2f);
         Destroy(this.gameObject);
     }

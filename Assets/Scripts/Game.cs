@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using LootLocker.Requests;
 
 public class Game : MonoBehaviour
 {
@@ -31,9 +32,15 @@ public class Game : MonoBehaviour
 
     int timer = 60;
 
+    [Header("LootLockerLeaderboard")]
+    public string leaderboardID = "24260";
+    bool uploadScore = false;
+
     private void Awake()
     {
+
         Control = this;
+
         //Setting the map size. Should be manually set if need to auto generate map 
         var bound = GameObject.Find("Boundary");
         mapHeight =(int) (bound.transform.Find("H UP").GetChild(0).position.y - bound.transform.Find("H Down").GetChild(0).position.y)+1;
@@ -99,12 +106,12 @@ public class Game : MonoBehaviour
             }
         }//
 
-        if (gameOver)
+        if (gameOver && uploadScore)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 Time.timeScale = 1f;
-                SceneManager.LoadScene(0);
+                SceneManager.LoadScene(2);
             }
         }
 
@@ -154,6 +161,27 @@ public class Game : MonoBehaviour
         healthText.text = "GAME OVER";
         gameOver = true;
         Time.timeScale = 0f;
+        StartCoroutine("SubmitScoreRoutine");
+    }
+
+    IEnumerator SubmitScoreRoutine() // lootlocker sublit score
+    {
+        string playerID = PlayerPrefs.GetString("PlayerID");
+        LootLockerSDKManager.SubmitScore(playerID, score, leaderboardID, (response) =>
+        {
+            if (response.success)
+            {
+                Debug.Log("Score uploaded");
+                uploadScore = true;
+            }
+            else
+            {
+                Debug.Log("Failed to upload scores. " + response.errorData);
+                uploadScore = true;
+            }
+        });
+
+        yield return new WaitWhile(() => uploadScore == true);
     }
 
     public void updateScore(int scoreToAdd)

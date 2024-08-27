@@ -27,6 +27,7 @@ public class NPCContol : MonoBehaviour
    
     void Start()
     {
+        speed = speed +( Random.value-0.5f)*2;
         wallLayer = LayerMask.GetMask("Wall");
         boxLayer = LayerMask.GetMask("Box");
         astarPath= new List<Vector3>();

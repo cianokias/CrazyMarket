@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
+//using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Android;
 
@@ -158,7 +158,7 @@ public class NPCContol : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Pickup")
+        if (collision.gameObject.tag == "Pickup" && Game.Control.recovering)
         {
             Destroy(collision.gameObject);
             score += 100;

@@ -125,7 +125,7 @@ public class PlayerControl : MonoBehaviour
 
         if (collision.gameObject.tag == "NPC")
         {
-            Game.Control.health -= 1;
+            Game.Control.updateHealth(-1);
             if (Game.Control.health == 0)
             {
                 Game.Control.resetPlayer();

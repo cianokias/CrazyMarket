@@ -27,6 +27,9 @@ public class BoxControl : MonoBehaviour
         wallLayer = LayerMask.GetMask("Wall");
         boxLayer = LayerMask.GetMask("Box");
 
+        //set box orderInLayer
+        GetComponent<SpriteRenderer>().sortingOrder = 14 - (int)transform.position.y;
+
         //special box change sprite
         //todo
         if (isSpecialBox)

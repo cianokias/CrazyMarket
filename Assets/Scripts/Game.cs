@@ -58,13 +58,13 @@ public class Game : MonoBehaviour
     {
         recovering = true;
         player.SetActive(false);
-        health = 4;
-        updateHealth(0);
-        scoreText.text = "LAST CHANCE";
+        healthText.text = "LAST CHANCE";
         secondLife = true;
         yield return new WaitForSeconds(1.0f);
         player.transform.position = startPoint;
         yield return new WaitForSeconds(2.0f);
+        health = 4;
+        updateHealth(0);
         player.SetActive(true);
         recovering = false;
         updateScore(0);

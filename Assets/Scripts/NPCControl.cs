@@ -167,6 +167,7 @@ public class NPCContol : MonoBehaviour
 
     private void Die()
     {
+        Game.Control.updateScore(200); // TODO: kill more gain more
         Destroy(gameObject);
     }
 

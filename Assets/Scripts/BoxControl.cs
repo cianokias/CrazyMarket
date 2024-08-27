@@ -24,6 +24,7 @@ public class BoxControl : MonoBehaviour
     LayerMask boxLayer;
 
     SpriteRenderer sr;
+    int killCount = 0;
 
     private void OnValidate()
     {
@@ -139,8 +140,9 @@ public class BoxControl : MonoBehaviour
     {
         if (isPushed && collision.gameObject.tag == "NPC")
         {
-            // TODO: NPC HP--
-            collision.GetComponent<NPCContol>().health--;
+            Destroy(collision.gameObject);
+            killCount++;
+            Game.Control.updateScore(100 * killCount);
         }
     }
 }

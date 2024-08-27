@@ -8,7 +8,6 @@ using UnityEngine.Android;
 public class NPCContol : MonoBehaviour
 {
     public float speed = 1.5f;
-    public int health = 1;
     public int score = 0;
 
     List<Vector3> astarPath;
@@ -59,10 +58,10 @@ public class NPCContol : MonoBehaviour
 
         }
 
-        if (health<=0)
+/*        if (health<=0)
         {
             Die();
-        }
+        }*/
 
         /*
          //move to destination
@@ -165,11 +164,11 @@ public class NPCContol : MonoBehaviour
         }
     }
 
-    private void Die()
+/*    private void Die()
     {
         Game.Control.updateScore(200); // TODO: kill more gain more
         Destroy(gameObject);
-    }
+    }*/
 
     private void NPCThought()//敌人思考去哪里
     {

@@ -16,11 +16,14 @@ public class PlayerControl : MonoBehaviour
     LayerMask wallLayer;       // wall layer
     LayerMask boxLayer;        // box layer
 
+    Animator anim;
+
     void Start()
     {
         wallLayer = LayerMask.GetMask("Wall");
         boxLayer = LayerMask.GetMask("Box");
         destination = transform.position;
+        anim = GetComponent<Animator>();
     }
 
     private void OnEnable()
@@ -45,18 +48,22 @@ public class PlayerControl : MonoBehaviour
             if (Input.GetAxis("Horizontal") >= 0.2f)
             {
                 moveDirection = Vector2.right;
+                anim.SetInteger("faceDirection", 1);
             }
             else if (Input.GetAxis("Horizontal") <= -0.2f)
             {
                 moveDirection = Vector2.left;
+                anim.SetInteger("faceDirection", 3);
             }
             else if (Input.GetAxis("Vertical") >= 0.2f)
             {
                 moveDirection = Vector2.up;
+                anim.SetInteger("faceDirection", 2);
             }
             else if (Input.GetAxis("Vertical") <= -0.2f)
             {
                 moveDirection = Vector2.down;
+                anim.SetInteger("faceDirection", 0);
             }
 
             //if there is a input

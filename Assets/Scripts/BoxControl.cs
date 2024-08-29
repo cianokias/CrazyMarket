@@ -9,7 +9,7 @@ public class BoxControl : MonoBehaviour
     //public bool isSpecialBox = false;
     public int boxType = 0;
     public GameObject[] pickup;
-    public GameObject powerup;
+    public GameObject[] powerup;
     public Sprite[] boxSprites;
 
     [Header("DontCare")]
@@ -43,6 +43,9 @@ public class BoxControl : MonoBehaviour
             case 3:
                 sr.sprite = boxSprites[3];
                 break;
+            case 4:
+                sr.sprite = boxSprites[4];
+                break;
         }
     }
 
@@ -54,7 +57,7 @@ public class BoxControl : MonoBehaviour
 
         //set box orderInLayer
         sr = GetComponent<SpriteRenderer>();
-        sr.sortingOrder = 14 - (int)transform.position.y;
+        sr.sortingOrder = (14 - (int)transform.position.y) * 2;
 
         //special box change sprite
         /*if (isSpecialBox)
@@ -74,6 +77,9 @@ public class BoxControl : MonoBehaviour
                 break;
             case 3:
                 sr.sprite = boxSprites[3];
+                break;
+            case 4:
+                sr.sprite = boxSprites[4];
                 break;
 
         }
@@ -127,8 +133,12 @@ public class BoxControl : MonoBehaviour
                 Instantiate(pickup[2], transform.position, pickup[2].transform.rotation);
                 break;
             case 3:
-                Instantiate(powerup, transform.position, powerup.transform.rotation);
+                Instantiate(powerup[0], transform.position, powerup[0].transform.rotation);
                 break;
+            case 4:
+                Instantiate(powerup[1], transform.position, powerup[1].transform.rotation);
+                break;
+
 
         }
 

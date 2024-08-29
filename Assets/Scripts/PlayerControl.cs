@@ -17,6 +17,7 @@ public class PlayerControl : MonoBehaviour
     LayerMask boxLayer;        // box layer
 
     Animator anim;
+    SpriteRenderer sr;
 
     void Start()
     {
@@ -24,6 +25,7 @@ public class PlayerControl : MonoBehaviour
         boxLayer = LayerMask.GetMask("Box");
         destination = transform.position;
         anim = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>();
     }
 
     private void OnEnable()
@@ -43,6 +45,7 @@ public class PlayerControl : MonoBehaviour
         if (canMove && !isMoving && !Game.Control.recovering)
         {
             moveDirection = Vector2.zero;
+            sr.sortingOrder = (14 - (int)transform.position.y) * 2 + 1;
 
             //user input
             if (Input.GetAxis("Horizontal") >= 0.2f)

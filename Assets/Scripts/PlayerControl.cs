@@ -36,6 +36,7 @@ public class PlayerControl : MonoBehaviour
     private void OnEnable()
     {
         destination = transform.position;
+        Time.timeScale = 1f;
         StartCoroutine(cannotBeHurt(2f));
     }
 
@@ -47,11 +48,15 @@ public class PlayerControl : MonoBehaviour
         //check if at destination
         if ((Vector2)transform.position == destination) { isMoving = false; }
 
+        if (Input.GetAxis("Horizontal") == 0f && Input.GetAxis("Vertical") == 0f) { anim.SetBool("isWalking", false); }
+        
+        //update sortingorder
+        sr.sortingOrder = (14 - (int)transform.position.y) * 2 + 1;
+        
         //move logic
         if (canMove && !isMoving && !Game.Control.recovering)
         {
             moveDirection = Vector2.zero;
-            sr.sortingOrder = (14 - (int)transform.position.y) * 2 + 1;
 
             //user input
             if (Input.GetAxis("Horizontal") >= 0.2f)
@@ -89,6 +94,7 @@ public class PlayerControl : MonoBehaviour
                     destination += moveDirection;
                     canMove = false;
                     isMoving = true;
+                    anim.SetBool("isWalking", true);
                     StartCoroutine("moving");
                 }
             }

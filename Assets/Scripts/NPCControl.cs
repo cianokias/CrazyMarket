@@ -8,7 +8,6 @@ using UnityEngine.Android;
 public class NPCContol : MonoBehaviour
 {
     public float speed = 1.5f;
-    public int health = 1;
     public int score = 0;
 
     List<Vector3> astarPath;
@@ -24,6 +23,7 @@ public class NPCContol : MonoBehaviour
     LayerMask wallLayer;       // wall layer
     LayerMask boxLayer;        // box layer
 
+    SpriteRenderer sr;
    
     void Start()
     {
@@ -31,7 +31,7 @@ public class NPCContol : MonoBehaviour
         wallLayer = LayerMask.GetMask("Wall");
         boxLayer = LayerMask.GetMask("Box");
         astarPath= new List<Vector3>();
-        
+        sr = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -45,6 +45,7 @@ public class NPCContol : MonoBehaviour
         if (!isMoving)
         {
             NPCThought();
+            sr.sortingOrder = (14 - (int)transform.position.y) * 2 + 1;
         }
 
         if (canMove)
@@ -60,10 +61,10 @@ public class NPCContol : MonoBehaviour
 
         }
 
-        if (health<=0)
+/*        if (health<=0)
         {
             Die();
-        }
+        }*/
 
         /*
          //move to destination
@@ -166,10 +167,11 @@ public class NPCContol : MonoBehaviour
         }
     }
 
-    private void Die()
+/*    private void Die()
     {
+        Game.Control.updateScore(200); // TODO: kill more gain more
         Destroy(gameObject);
-    }
+    }*/
 
     private void NPCThought()//敌人思考去哪里
     {

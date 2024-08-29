@@ -143,8 +143,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e043d5074a8225a4eb434055cb0577aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isSpecialBox: 0
-  pickup: {fileID: 7771809378837679153, guid: de696f1d9d5e64f439c90768097d02b2, type: 3}
-  powerup: {fileID: 7771809378837679153, guid: aff5befd7451d423ca891c1a8027d03c, type: 3}
+  boxType: 0
+  pickup:
+  - {fileID: 7771809378837679153, guid: de696f1d9d5e64f439c90768097d02b2, type: 3}
+  - {fileID: 7771809378837679153, guid: 02d09aa12876bc647b6528a81a96be12, type: 3}
+  - {fileID: 7771809378837679153, guid: 320999693b37b114093f405c502e2e1a, type: 3}
+  powerup:
+  - {fileID: 7771809378837679153, guid: 6de4eb8817e798a44901b8092a3fd00e, type: 3}
+  - {fileID: 7771809378837679153, guid: aff5befd7451d423ca891c1a8027d03c, type: 3}
+  boxSprites:
+  - {fileID: 21300000, guid: fe83b9107f0c7d14cb3c30c1e2e5d6f9, type: 3}
+  - {fileID: 21300000, guid: bc473257081670845bdad8c406ef496e, type: 3}
+  - {fileID: 21300000, guid: 8950119f83abe2f469e62a20c718741c, type: 3}
+  - {fileID: 21300000, guid: e5ee55f81f0181c4ab41fa2ff7c40b7b, type: 3}
+  - {fileID: 21300000, guid: cc0aa278d7a863949811b3b795e53f33, type: 3}
   isPushed: 0
   moveDirection: {x: 0, y: 0}

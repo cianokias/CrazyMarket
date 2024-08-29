@@ -23,13 +23,14 @@ public class NPCContol : MonoBehaviour
     LayerMask wallLayer;       // wall layer
     LayerMask boxLayer;        // box layer
 
+    SpriteRenderer sr;
    
     void Start()
     {
         wallLayer = LayerMask.GetMask("Wall");
         boxLayer = LayerMask.GetMask("Box");
         astarPath= new List<Vector3>();
-        
+        sr = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -43,6 +44,7 @@ public class NPCContol : MonoBehaviour
         if (!isMoving)
         {
             NPCThought();
+            sr.sortingOrder = (14 - (int)transform.position.y) * 2 + 1;
         }
 
         if (canMove)

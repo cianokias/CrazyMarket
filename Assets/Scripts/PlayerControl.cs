@@ -12,26 +12,37 @@ public class PlayerControl : MonoBehaviour
     bool canMove = true;
     bool isMoving = false;
 
+    //box pushing
     float rayDistance = 1.0f;  // Raycast distance
     LayerMask wallLayer;       // wall layer
     LayerMask boxLayer;        // box layer
 
-    void Start()
+    //other
+    bool canBeHurt = true;
+    float speedForOneBlock = 0.2f;
+
+    //components
+    Animator anim;
+    SpriteRenderer sr;
+
+    private void Awake()
     {
         wallLayer = LayerMask.GetMask("Wall");
         boxLayer = LayerMask.GetMask("Box");
         destination = transform.position;
+        anim = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>();
     }
-
     private void OnEnable()
     {
         destination = transform.position;
+        StartCoroutine(cannotBeHurt(2f));
     }
 
     void Update()
     {
         //move to destination
-        transform.position = Vector2.MoveTowards(transform.position, destination, 5 * Time.deltaTime);
+        transform.position = Vector2.MoveTowards(transform.position, destination, (1 / speedForOneBlock) * Time.deltaTime);
 
         //check if at destination
         if ((Vector2)transform.position == destination) { isMoving = false; }
@@ -40,23 +51,28 @@ public class PlayerControl : MonoBehaviour
         if (canMove && !isMoving && !Game.Control.recovering)
         {
             moveDirection = Vector2.zero;
+            sr.sortingOrder = (14 - (int)transform.position.y) * 2 + 1;
 
             //user input
             if (Input.GetAxis("Horizontal") >= 0.2f)
             {
                 moveDirection = Vector2.right;
+                anim.SetInteger("faceDirection", 1);
             }
             else if (Input.GetAxis("Horizontal") <= -0.2f)
             {
                 moveDirection = Vector2.left;
+                anim.SetInteger("faceDirection", 3);
             }
             else if (Input.GetAxis("Vertical") >= 0.2f)
             {
                 moveDirection = Vector2.up;
+                anim.SetInteger("faceDirection", 2);
             }
             else if (Input.GetAxis("Vertical") <= -0.2f)
             {
                 moveDirection = Vector2.down;
+                anim.SetInteger("faceDirection", 0);
             }
 
             //if there is a input
@@ -78,7 +94,7 @@ public class PlayerControl : MonoBehaviour
             }
         }
 
-        //push the box/////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //push the box/////////////////////////////////////////////////////////////////////////////////////
         if (Input.GetKeyDown(KeyCode.Space))
         {
             RaycastHit2D hit = Physics2D.Raycast(transform.position, faceDirection, rayDistance, boxLayer);
@@ -95,7 +111,7 @@ public class PlayerControl : MonoBehaviour
 
     IEnumerator moving()
     {
-        yield return new WaitForSeconds(0.2f); //0.2f = time used to move 1 step
+        yield return new WaitForSeconds(speedForOneBlock); //deafult 0.2f = time used to move 1 step
         canMove = true;
     }
 
@@ -119,18 +135,46 @@ public class PlayerControl : MonoBehaviour
         if (collision.gameObject.tag == "PowerUp")
         {
             Destroy(collision.gameObject);
-            Game.Control.updateScore(100);
-            Debug.Log("a power up!");
+            Game.Control.updateScore(200);
+            StartCoroutine(cannotBeHurt(8f));
+            StartCoroutine(speedBoost(8f));
+        }
+
+        if (collision.gameObject.tag == "PowerUpHP")
+        {
+            Destroy(collision.gameObject);
+            Game.Control.updateScore(200);
+            Game.Control.updateHealth(1);
         }
 
         if (collision.gameObject.tag == "NPC")
         {
-            Game.Control.updateHealth(-1);
-            if (Game.Control.health == 0)
+            if (canBeHurt)
             {
-                Game.Control.resetPlayer();
+                StartCoroutine(cannotBeHurt(0.5f));
+                Game.Control.updateHealth(-1);
+                if (Game.Control.health == 0)
+                {
+                    Game.Control.resetPlayer();
+                }
             }
         }
+    }
+
+    IEnumerator cannotBeHurt(float time)
+    {
+        canBeHurt = false;
+        sr.color = Color.yellow;
+        yield return new WaitForSeconds(time);
+        canBeHurt = true;
+        sr.color = Color.white;
+    }
+
+    IEnumerator speedBoost(float time)
+    {
+        speedForOneBlock = 0.15f;
+        yield return new WaitForSeconds(time);
+        speedForOneBlock = 0.2f;
     }
 
 }

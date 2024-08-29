@@ -37,6 +37,11 @@ public class HighScoreSceneControl : MonoBehaviour
 
                 for (int i = 0; i < members.Length; i++)
                 {
+                    if (i == 0) { tempPlayerNames += "<color=#FFD700><b><size=+10>"; tempPlayerScores += "<color=#FFD700><b><size=+10>"; }
+                    if (i == 1) { tempPlayerNames += "<color=#FFFFFF><size=+5>"; tempPlayerScores += "<color=#FFFFFF><size=+5>"; }
+                    if (i == 2) { tempPlayerNames += "<color=#CD7F32><size=+3>"; tempPlayerScores += "<color=#CD7F32><size=+3>"; }
+                    if (i == 3) { tempPlayerNames += "<color=#666666></b><size=100%>"; tempPlayerScores += "<color=#666666></b><size=100%>"; }
+
                     if (members[i].player.name != "")
                     {
                         tempPlayerNames += members[i].player.name;

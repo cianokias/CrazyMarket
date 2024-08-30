@@ -4,7 +4,6 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 using LootLocker.Requests;
-using static UnityEditor.Progress;
 
 public class Game : MonoBehaviour
 {

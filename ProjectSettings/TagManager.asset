@@ -10,6 +10,7 @@ TagManager:
   - Boundary
   - NPC
   - PowerUpHP
+  - Checkout
   layers:
   - Default
   - TransparentFX

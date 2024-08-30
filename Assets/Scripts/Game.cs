@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 using LootLocker.Requests;
+using static UnityEditor.Progress;
 
 public class Game : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class Game : MonoBehaviour
     public GameObject player;
     public int health = 4;
     public int score = 0;
+    public int item = 0;
     public bool secondLife = false;
     public bool recovering = false;
     public bool gameOver = false;
@@ -22,6 +24,7 @@ public class Game : MonoBehaviour
     public TMP_Text scoreText;
     public TMP_Text healthText;
     public TMP_Text timerText;
+    public TMP_Text itemText;
     public GameObject NPC;
 
     [Header("MapInfo")]
@@ -32,13 +35,16 @@ public class Game : MonoBehaviour
 
     int timer = 60;
 
+    [Header("OverHeadText")]
+    public GameObject ohtPrefeb;
+    public GameObject canvas;
+
     [Header("LootLockerLeaderboard")]
     public string leaderboardID = "24260";
     bool uploadScore = false;
 
     private void Awake()
     {
-
         Control = this;
 
         //Setting the map size. Should be manually set if need to auto generate map 
@@ -87,7 +93,7 @@ public class Game : MonoBehaviour
             if (timer <= 0) { gameEnd(); }
             if (timer % 10 == 0)
             {
-
+                //generate new npcs
                 Instantiate(NPC, new Vector3(player.transform.position.x >= 8 ? 1 : 15, player.transform.position.y >= 7 ? 1 : 13), NPC.transform.rotation);
             }
         }
@@ -96,15 +102,20 @@ public class Game : MonoBehaviour
     private void Update()
     {
         RefreshMapInfo();
-        //test only, press F to HP--
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            updateHealth(-1);
-            if (health == 0)
-            {
-                resetPlayer();
-            }
-        }//
+        ////test only, press F to HP--
+        //if (Input.GetKeyDown(KeyCode.F))
+        //{
+        //    updateHealth(-1);
+        //    if (health == 0)
+        //    {
+        //        resetPlayer();
+        //    }
+        //}//
+        ////test only, press G to displayOHT
+        //if (Input.GetKeyDown(KeyCode.G))
+        //{
+        //    displayOHT("+100", player.transform);
+        //}//
 
         if (gameOver && uploadScore)
         {
@@ -194,5 +205,19 @@ public class Game : MonoBehaviour
     {
         health += healthToAdd;
         healthText.text = "HP " + health.ToString();
+    }
+
+    public void updateItem(int itemToAdd)
+    {
+        item += itemToAdd;
+        itemText.text = "Item " + item.ToString("00");
+    }
+
+    public void displayOHT(string textToDisplay, Vector3 targetPosition)
+    {
+        Vector3 position = Camera.main.WorldToScreenPoint(targetPosition);
+        OverHeadText newOHT = Instantiate(ohtPrefeb, canvas.transform).GetComponent<OverHeadText>();
+        newOHT.tmpText.text = textToDisplay;
+        newOHT.screenPosition = position;
     }
 }

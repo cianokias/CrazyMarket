@@ -146,7 +146,7 @@ public class PlayerControl : MonoBehaviour
                 StartCoroutine(anotherOHT("Score +" + tempItem * 100, pos, 1.5f));
                 StartCoroutine(anotherOHT("Item -" + tempItem, pos, 1f));
 
-                //AddtimeTODO
+                Game.Control.timer += 0.3f * tempItem * (1 + 0.07f * (tempItem - 1));
             }
         }
 

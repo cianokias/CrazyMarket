@@ -17647,7 +17647,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 60
+  m_text: 20.000
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 742b834c9d6cee84a837d3946d022c74, type: 2}
   m_sharedMaterial: {fileID: -5315848075824255774, guid: 742b834c9d6cee84a837d3946d022c74, type: 2}
@@ -26971,6 +26971,7 @@ MonoBehaviour:
   mapHeight: 0
   mapWidth: 0
   objs: {fileID: 1934687585}
+  timer: 20
   ohtPrefeb: {fileID: 2527758437893256356, guid: 5cb6220ce40d0e84286b62773d230e82, type: 3}
   canvas: {fileID: 1514367444}
   leaderboardID: 24260

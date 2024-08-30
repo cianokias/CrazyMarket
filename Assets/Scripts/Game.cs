@@ -33,7 +33,9 @@ public class Game : MonoBehaviour
     public GameObject objs;
     public int[,] mapInfo;
 
-    int timer = 60;
+    [Header("Timer")]
+    public float timer = 20;
+    int npcTimer = 10;
 
     [Header("OverHeadText")]
     public GameObject ohtPrefeb;
@@ -88,13 +90,15 @@ public class Game : MonoBehaviour
         while (!gameOver)
         {
             yield return new WaitForSeconds(1.0f);
-            timer -= 1;
-            timerText.text = timer.ToString("00");
-            if (timer <= 0) { gameEnd(); }
-            if (timer % 10 == 0)
+            npcTimer -= 1;
+            if (npcTimer <= 0)
             {
-                //generate new npcs
-                Instantiate(NPC, new Vector3(player.transform.position.x >= 8 ? 1 : 15, player.transform.position.y >= 7 ? 1 : 13), NPC.transform.rotation);
+                npcTimer = 10;
+                Instantiate(NPC,
+                            new Vector3(player.transform.position.x >= 8 ? 1 : 15,
+                                        player.transform.position.y >= 7 ? 1 : 13),
+                            NPC.transform.rotation);
+            
             }
         }
     }
@@ -102,20 +106,13 @@ public class Game : MonoBehaviour
     private void Update()
     {
         RefreshMapInfo();
-        ////test only, press F to HP--
-        //if (Input.GetKeyDown(KeyCode.F))
-        //{
-        //    updateHealth(-1);
-        //    if (health == 0)
-        //    {
-        //        resetPlayer();
-        //    }
-        //}//
-        ////test only, press G to displayOHT
-        //if (Input.GetKeyDown(KeyCode.G))
-        //{
-        //    displayOHT("+100", player.transform);
-        //}//
+
+        if (!gameOver)
+        {
+            timer -=  Time.deltaTime;
+            if (timer <= 0) { timer = 0; gameEnd(); }
+            timerText.text = timer.ToString("00.000");
+        }
 
         if (gameOver && uploadScore)
         {

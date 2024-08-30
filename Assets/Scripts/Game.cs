@@ -44,6 +44,7 @@ public class Game : MonoBehaviour
     [Header("LootLockerLeaderboard")]
     public string leaderboardID = "24260";
     bool uploadScore = false;
+    bool wait3sec = false;
 
     private void Awake()
     {
@@ -114,7 +115,7 @@ public class Game : MonoBehaviour
             timerText.text = timer.ToString("00.000");
         }
 
-        if (gameOver && uploadScore)
+        if (gameOver && uploadScore && wait3sec)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
@@ -189,7 +190,9 @@ public class Game : MonoBehaviour
             }
         });
 
-        yield return new WaitWhile(() => uploadScore == true);
+        yield return new WaitWhile(() => uploadScore == false);
+        yield return new WaitForSecondsRealtime(3);
+        wait3sec = true;
     }
 
     public void updateScore(int scoreToAdd)

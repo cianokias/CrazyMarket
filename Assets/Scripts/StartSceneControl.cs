@@ -42,7 +42,7 @@ public class StartSceneControl : MonoBehaviour
             }
         });
 
-        yield return new WaitWhile(() => done = false);
+        yield return new WaitWhile(() => done == false);
         isLogin = true;
     }
 

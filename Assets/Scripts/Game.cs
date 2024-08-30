@@ -164,7 +164,7 @@ public class Game : MonoBehaviour
         StartCoroutine("SubmitScoreRoutine");
     }
 
-    IEnumerator SubmitScoreRoutine() // lootlocker sublit score
+    IEnumerator SubmitScoreRoutine() // lootlocker submit score
     {
         string playerID = PlayerPrefs.GetString("PlayerID");
         LootLockerSDKManager.SubmitScore(playerID, score, leaderboardID, (response) =>

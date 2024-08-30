@@ -20,7 +20,6 @@ public class PlayerControl : MonoBehaviour
     //other
     bool canBeHurt = true;
     float speedForOneBlock = 0.2f;
-    bool recoverOnce = false;
 
     //components
     Animator anim;
@@ -160,9 +159,8 @@ public class PlayerControl : MonoBehaviour
             {
                 StartCoroutine(cannotBeHurt(0.5f));
                 Game.Control.updateHealth(-1);
-                if (Game.Control.health == 0 && !recoverOnce)
+                if (Game.Control.health <= 0)
                 {
-                    recoverOnce = true;
                     Game.Control.resetPlayer();
                 }
             }

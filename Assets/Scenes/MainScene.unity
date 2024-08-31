@@ -26971,7 +26971,7 @@ MonoBehaviour:
   mapHeight: 0
   mapWidth: 0
   objs: {fileID: 1934687585}
-  timer: 20
+  timer: 50
   ohtPrefeb: {fileID: 2527758437893256356, guid: 5cb6220ce40d0e84286b62773d230e82, type: 3}
   canvas: {fileID: 1514367444}
   leaderboardID: 24260

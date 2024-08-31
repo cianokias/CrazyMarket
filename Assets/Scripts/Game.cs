@@ -72,6 +72,10 @@ public class Game : MonoBehaviour
     IEnumerator anotherChance()
     {
         recovering = true;
+
+        displayOHT("Item -" + (item >= 3 ? 3 : item), player.transform.position);
+        updateItem(item >= 3 ? -3 : -item);
+
         player.SetActive(false);
         healthText.text = "LAST CHANCE";
         secondLife = true;

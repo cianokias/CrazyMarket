@@ -138,7 +138,7 @@ public class Game : MonoBehaviour
             }
             
         }
-
+        //Add the Objs
         var objs = GameObject.Find("Objects").transform;
         for (int i = 0; i < objs.childCount; i++)
         {
@@ -150,10 +150,15 @@ public class Game : MonoBehaviour
             else if (objs.GetChild(i).tag == "Pickup")
             {
                 mapInfo[x, y] = 0;
-            }
-            
+            }            
         }
-
+        //Add the npcs
+        var npcs = GameObject.Find("NPC List").transform;
+        for (int i = 0; i < npcs.childCount; i++)
+        {
+            int x = (int)(npcs.GetChild(i).transform.position.x+0.5f), y = (int)(npcs.GetChild(i).transform.position.y+0.5f);
+            mapInfo[(int)x, (int)y] = 4;
+        }
     }
 
     void gameEnd()

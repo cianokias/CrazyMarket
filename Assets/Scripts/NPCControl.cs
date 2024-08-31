@@ -23,6 +23,67 @@ public class NPCContol : MonoBehaviour
     LayerMask wallLayer;       // wall layer
     LayerMask boxLayer;        // box layer
 
+    int[,] _mapinfo = null;
+    int[,] MapInfo
+    {
+        get
+        {
+            if (_mapinfo is null)
+            {
+                if (Game.Control is null)
+                {
+                    _mapinfo= GameObject.Find("NPC_SceneControl").GetComponent<NPC_SceneControl>().MapInfo;
+                }
+                else
+                {
+                    _mapinfo= Game.Control.mapInfo;
+                }
+            }
+                return _mapinfo;
+        }
+    }
+
+    GameObject _playerGO;
+    GameObject PlayerGO
+    {
+        get
+        {
+            if (_playerGO == null)
+            {
+                if(Game.Control is not null)
+                {
+                    _playerGO=Game.Control.player; 
+                }
+                else
+                {
+                    _playerGO = GameObject.Find("Player");
+                }
+            }
+            return _playerGO;
+
+        }
+    }
+
+    GameObject _obj;
+    GameObject Obj
+    {
+        get
+        {
+            if(_obj == null)
+            {
+                if( Game.Control is not null)
+                {
+                    _obj = Game.Control.objs;
+                }
+                else
+                {
+                    _obj = GameObject.Find("Obj");
+                }
+            }
+            return _obj;
+        }
+    }
+
     SpriteRenderer sr;
 
     NPCState curState = null;
@@ -177,7 +238,7 @@ public class NPCContol : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Pickup" && Game.Control.recovering)
+        if (collision.gameObject.tag == "Pickup")
         {
             Destroy(collision.gameObject);
             score += 100;
@@ -199,7 +260,7 @@ public class NPCContol : MonoBehaviour
             for (int i = 0; i < 4; i++) 
             {
                 var checkpos = new Vector2Int((int)(transform.position.x + 0.5), (int)(transform.position.y + 0.5)) + direction[i];
-                if (Game.Control.mapInfo[checkpos.x, checkpos.y] == 0)
+                if (MapInfo[checkpos.x, checkpos.y] == 0)
                 {
                     blocked = false;
                     break;
@@ -211,9 +272,9 @@ public class NPCContol : MonoBehaviour
             return;
 
         //if player alive, chase player
-        if (Game.Control.player.activeSelf)
+        if (PlayerGO.activeSelf)
         {
-            Vector2Int playerPos = new Vector2Int((int)(Game.Control.player.transform.position.x+0.5), (int)(Game.Control.player.transform.position.y + 0.5));
+            Vector2Int playerPos = new Vector2Int((int)(PlayerGO.transform.position.x+0.5), (int)(PlayerGO.transform.position.y + 0.5));
             destination = AStarPathFind(playerPos);
             return;
         }
@@ -222,14 +283,14 @@ public class NPCContol : MonoBehaviour
         float nearPickupDis = 19260817;
         Vector2Int pickupPos = new Vector2Int();
         
-        for (int i = 0; i < Game.Control.objs.transform.childCount; i++) 
+        for (int i = 0; i < Obj.transform.childCount; i++) 
         {
-            if (Game.Control.objs.transform.GetChild(i).tag == "Pickup")
+            if (Obj.transform.GetChild(i).tag == "Pickup")
             {
-                if (Vector2.Distance(Game.Control.objs.transform.GetChild(i).position, transform.position) < nearPickupDis)
+                if (Vector2.Distance(Obj.transform.GetChild(i).position, transform.position) < nearPickupDis)
                 {
-                    nearPickupDis = Vector2.Distance(Game.Control.objs.transform.GetChild(i).position, transform.position);
-                    pickupPos =new Vector2Int((int)(Game.Control.objs.transform.GetChild(i).position.x+0.5), (int)(Game.Control.objs.transform.GetChild(i).position.y + 0.5)) ;
+                    nearPickupDis = Vector2.Distance(Obj.transform.GetChild(i).position, transform.position);
+                    pickupPos =new Vector2Int((int)(Obj.transform.GetChild(i).position.x+0.5), (int)(Obj.transform.GetChild(i).position.y + 0.5)) ;
                 }
             }
         }
@@ -245,7 +306,7 @@ public class NPCContol : MonoBehaviour
         
         destination = new Vector2Int((int)(transform.position.x+0.5), (int)(transform.position.y + 0.5)) + direction[d];
         int loop = 0;
-        while (Game.Control.mapInfo[(int)destination.x, (int)destination.y] >0 && loop < 6)
+        while (MapInfo[(int)destination.x, (int)destination.y] >0 && loop < 6)
         {
             loop++;
             d = (d + 1) % 4;
@@ -260,7 +321,7 @@ public class NPCContol : MonoBehaviour
 
     private class Node
     {
-        public int f,g,h;
+        public int f,g;
         
         public Vector2Int pos;
         public Node parent;
@@ -290,6 +351,7 @@ public class NPCContol : MonoBehaviour
         Node startNode = new Node((int)(transform.position.x + 0.5), (int)(transform.position.y + 0.5));
         openList.Add(new Node(startNode.pos.x, startNode.pos.y));
         List<Vector2Int> direction=new List<Vector2Int>() { Vector2Int.up,Vector2Int.down,Vector2Int.left,Vector2Int.right};
+        /*
         for(int i = 0;i<4;i++)//Add pos around curPos
         {
             int x = startNode.pos.x + direction[i].x,y= startNode.pos.y+direction[i].y;
@@ -297,7 +359,7 @@ public class NPCContol : MonoBehaviour
             {
                 continue;
             }
-            else if (Game.Control.mapInfo[x,y]>0)
+            else if (MapInfo[x,y]>0)
             {
                 continue;
             }
@@ -308,7 +370,7 @@ public class NPCContol : MonoBehaviour
         }
         closeList.Add(startNode);
         openList.Remove(startNode);
-
+        */
         //Path Sorting
         for (int findTime = 0; openList.Count > 0; findTime++)
         {
@@ -326,14 +388,15 @@ public class NPCContol : MonoBehaviour
             {
                 int x = node.pos.x + direction[i].x, y = node.pos.y + direction[i].y;
                 Node nextNode=new Node(x, y, node);
-                nextNode.g = node.f+1;
+                nextNode.g = node.f+MapInfo[x,y]+1;
 
                 if (x == 0 || x == 16 || y == 0 || y == 16)//检测是否到达边界
                 {
                     continue;
                 }
-                else if (Game.Control.mapInfo[x, y] > 0)//检测是否有障碍物
+                else if (MapInfo[x, y] >100)//检测是否有障碍物
                 {
+                    Debug.Log($"Skip box {MapInfo[x,y]}");
                     continue;
                 }
 
@@ -345,7 +408,7 @@ public class NPCContol : MonoBehaviour
                 }
 
                 bool flag = false;
-                for (int j = 0; j < closeList.Count; j++)//检测相邻节点是否在close中
+                for (int j = 0; j < closeList.Count; j++)//检测该节点是否在close中
                 {
                     if (closeList[j].pos == nextNode.pos)
                     {
@@ -354,9 +417,9 @@ public class NPCContol : MonoBehaviour
                     }
                 }
                 if(flag)continue;
-                flag = false;
 
-                for (int j = 0; j < openList.Count; j++)//检测是否有相邻节点在open中
+                flag = false;
+                for (int j = 0; j < openList.Count; j++)//检测该节点是否已存在于open中
                 {
                     if (openList[j].pos == nextNode.pos)
                     {
@@ -400,7 +463,8 @@ public class NPCContol : MonoBehaviour
             log += $"{replayNode.parent.pos}->";
             replayNode = replayNode.parent;
         }
-
+        astarPath.Add(new Vector3(replayNode.pos.x, replayNode.pos.y));
+        astarPath.Add(new Vector3(startNode.pos.x, startNode.pos.y));
         return replayNode.pos;
     }
 }

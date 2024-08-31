@@ -21,7 +21,9 @@ public class NPC_SceneControl : MonoBehaviour
     {
         player = GameObject.Find("Player");
         MapInfo=new int[17,17];
+        RefreshMapInfo();
         NPC_Scene = this;
+
     }
 
     // Update is called once per frame
@@ -61,7 +63,9 @@ public class NPC_SceneControl : MonoBehaviour
                 if (i == 0 || i == 15 || j == 0 || j == 15)
                 {
                     MapInfo[i, j] = 19260817;
+                    continue;
                 }
+                MapInfo[i, j] = 0;
             }
         }
 
@@ -69,10 +73,17 @@ public class NPC_SceneControl : MonoBehaviour
         {
             var item= obj_trans.GetChild(i);
             int x=(int)item.position.x,y=(int)item.position.y;
-            if (item.tag == "Boundary"|| item.tag == "Box")
+            if (item.tag == "Box")
             {
                 MapInfo[x, y] = 114;
             }
+        }
+        var npcList = GameObject.Find("NPCList");
+        for (int i = 0; i < npcList.transform.childCount; i++)
+        {
+            int x=(int)(npcList.transform.GetChild(i).position.x+0.5f);
+            int y = (int)(npcList.transform.GetChild(i).position.y + 0.5f);
+            MapInfo[x, y] = 8;
         }
     }
 }

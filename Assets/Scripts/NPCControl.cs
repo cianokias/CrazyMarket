@@ -24,9 +24,24 @@ public class NPCContol : MonoBehaviour
     LayerMask boxLayer;        // box layer
 
     SpriteRenderer sr;
-   
+
+    NPCState curState = null;
+    List<NPCState> states = new List<NPCState>() {new State_Stay(),new State_Chase(),new State_Spread() };
+
     void Start()
     {
+        if (states.Count<=0)
+        {
+            Debug.LogError($"{transform.name} has no state, and will not work!");
+            return;
+        }
+
+        foreach (var state in states)
+        {
+            state.Init(this);
+        }
+        curState=states[0];
+
         speed = speed +( Random.value-0.5f)*2;
         wallLayer = LayerMask.GetMask("Wall");
         boxLayer = LayerMask.GetMask("Box");
@@ -36,6 +51,9 @@ public class NPCContol : MonoBehaviour
 
     void Update()
     {
+
+        curState.Refresh();
+
 
         for (int i = 0; i < astarPath.Count-1; i++)
         {

@@ -13,6 +13,7 @@ public class Game : MonoBehaviour
     public GameObject player;
     public int health = 4;
     public int score = 0;
+    public int item = 0;
     public bool secondLife = false;
     public bool recovering = false;
     public bool gameOver = false;
@@ -22,6 +23,7 @@ public class Game : MonoBehaviour
     public TMP_Text scoreText;
     public TMP_Text healthText;
     public TMP_Text timerText;
+    public TMP_Text itemText;
     public GameObject NPC;
 
     [Header("MapInfo")]
@@ -30,15 +32,21 @@ public class Game : MonoBehaviour
     public GameObject objs;
     public int[,] mapInfo;
 
-    int timer = 60;
+    [Header("Timer")]
+    public float timer = 20;
+    int npcTimer = 10;
+
+    [Header("OverHeadText")]
+    public GameObject ohtPrefeb;
+    public GameObject canvas;
 
     [Header("LootLockerLeaderboard")]
     public string leaderboardID = "24260";
     bool uploadScore = false;
+    bool wait3sec = false;
 
     private void Awake()
     {
-
         Control = this;
 
         //Setting the map size. Should be manually set if need to auto generate map 
@@ -64,6 +72,10 @@ public class Game : MonoBehaviour
     IEnumerator anotherChance()
     {
         recovering = true;
+
+        displayOHT("Item -" + (item >= 3 ? 3 : item), player.transform.position);
+        updateItem(item >= 3 ? -3 : -item);
+
         player.SetActive(false);
         healthText.text = "LAST CHANCE";
         secondLife = true;
@@ -82,13 +94,15 @@ public class Game : MonoBehaviour
         while (!gameOver)
         {
             yield return new WaitForSeconds(1.0f);
-            timer -= 1;
-            timerText.text = timer.ToString("00");
-            if (timer <= 0) { gameEnd(); }
-            if (timer % 10 == 0)
+            npcTimer -= 1;
+            if (npcTimer <= 0)
             {
-
-                Instantiate(NPC, new Vector3(player.transform.position.x >= 8 ? 1 : 15, player.transform.position.y >= 7 ? 1 : 13), NPC.transform.rotation);
+                npcTimer = 10;
+                Instantiate(NPC,
+                            new Vector3(player.transform.position.x >= 8 ? 1 : 15,
+                                        player.transform.position.y >= 7 ? 1 : 13),
+                            NPC.transform.rotation);
+            
             }
         }
     }
@@ -96,17 +110,15 @@ public class Game : MonoBehaviour
     private void Update()
     {
         RefreshMapInfo();
-        //test only, press F to HP--
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            updateHealth(-1);
-            if (health == 0)
-            {
-                resetPlayer();
-            }
-        }//
 
-        if (gameOver && uploadScore)
+        if (!gameOver)
+        {
+            timer -=  Time.deltaTime;
+            if (timer <= 0) { timer = 0; gameEnd(); }
+            timerText.text = timer.ToString("00.000");
+        }
+
+        if (gameOver && uploadScore && wait3sec)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
@@ -169,7 +181,7 @@ public class Game : MonoBehaviour
         StartCoroutine("SubmitScoreRoutine");
     }
 
-    IEnumerator SubmitScoreRoutine() // lootlocker sublit score
+    IEnumerator SubmitScoreRoutine() // lootlocker submit score
     {
         string playerID = PlayerPrefs.GetString("PlayerID");
         LootLockerSDKManager.SubmitScore(playerID, score, leaderboardID, (response) =>
@@ -186,7 +198,9 @@ public class Game : MonoBehaviour
             }
         });
 
-        yield return new WaitWhile(() => uploadScore == true);
+        yield return new WaitWhile(() => uploadScore == false);
+        yield return new WaitForSecondsRealtime(3);
+        wait3sec = true;
     }
 
     public void updateScore(int scoreToAdd)
@@ -199,5 +213,19 @@ public class Game : MonoBehaviour
     {
         health += healthToAdd;
         healthText.text = "HP " + health.ToString();
+    }
+
+    public void updateItem(int itemToAdd)
+    {
+        item += itemToAdd;
+        itemText.text = "Item " + item.ToString("00");
+    }
+
+    public void displayOHT(string textToDisplay, Vector3 targetPosition)
+    {
+        Vector3 position = Camera.main.WorldToScreenPoint(targetPosition);
+        OverHeadText newOHT = Instantiate(ohtPrefeb, canvas.transform).GetComponent<OverHeadText>();
+        newOHT.tmpText.text = textToDisplay;
+        newOHT.screenPosition = position;
     }
 }

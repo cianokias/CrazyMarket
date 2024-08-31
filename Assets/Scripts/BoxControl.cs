@@ -150,9 +150,11 @@ public class BoxControl : MonoBehaviour
     {
         if (isPushed && collision.gameObject.tag == "NPC")
         {
+            Game.Control.displayOHT("Time +3s",collision.transform.position);
             Destroy(collision.gameObject);
             killCount++;
             Game.Control.updateScore(100 * killCount);
+            Game.Control.timer += 3f;
         }
     }
 }

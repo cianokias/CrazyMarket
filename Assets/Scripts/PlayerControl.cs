@@ -20,7 +20,6 @@ public class PlayerControl : MonoBehaviour
     //other
     bool canBeHurt = true;
     float speedForOneBlock = 0.2f;
-    bool recoverOnce = false;
 
     //components
     Animator anim;
@@ -133,16 +132,41 @@ public class PlayerControl : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        Vector3 pos = collision.transform.position;
+
+        //checkout
+        if (collision.gameObject.tag == "Checkout")
+        {
+            int tempItem = Game.Control.item;
+            if (tempItem >= 0)
+            {
+                Game.Control.updateItem(-tempItem);
+                Game.Control.updateScore(tempItem * 100);
+
+                StartCoroutine(anotherOHT("Score +" + tempItem * 100, pos, 1.5f));
+                StartCoroutine(anotherOHT("Item -" + tempItem, pos, 1f));
+
+                //Game.Control.timer += 0.3f * tempItem * (1 + 0.07f * (tempItem - 1));
+                //Game.Control.timer += 0.3f * tempItem * 1.7f;
+            }
+        }
+
         if (collision.gameObject.tag == "Pickup")
         {
             Destroy(collision.gameObject);
-            Game.Control.updateScore(100);
+
+            Game.Control.updateItem(1);
+            Game.Control.displayOHT("Item +1", pos);
         }
 
         if (collision.gameObject.tag == "PowerUp")
         {
             Destroy(collision.gameObject);
+
             Game.Control.updateScore(200);
+            Game.Control.displayOHT("Score +200", pos);
+            StartCoroutine(anotherOHT("Speed Boost!", pos, 0.5f));
+
             StartCoroutine(cannotBeHurt(8f));
             StartCoroutine(speedBoost(8f));
         }
@@ -150,8 +174,11 @@ public class PlayerControl : MonoBehaviour
         if (collision.gameObject.tag == "PowerUpHP")
         {
             Destroy(collision.gameObject);
+
             Game.Control.updateScore(200);
+            Game.Control.displayOHT("Score +200", pos);
             Game.Control.updateHealth(1);
+            StartCoroutine(anotherOHT("HP +1", pos, 0.5f));
         }
 
         if (collision.gameObject.tag == "NPC")
@@ -160,13 +187,18 @@ public class PlayerControl : MonoBehaviour
             {
                 StartCoroutine(cannotBeHurt(0.5f));
                 Game.Control.updateHealth(-1);
-                if (Game.Control.health == 0 && !recoverOnce)
+                if (Game.Control.health <= 0)
                 {
-                    recoverOnce = true;
                     Game.Control.resetPlayer();
                 }
             }
         }
+    }
+
+    IEnumerator anotherOHT(string textToDisplay, Vector3 targetPosition, float timeToWait)
+    {
+        yield return new WaitForSeconds(timeToWait);
+        Game.Control.displayOHT(textToDisplay, targetPosition);
     }
 
     IEnumerator cannotBeHurt(float time)

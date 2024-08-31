@@ -10,7 +10,10 @@ public class HighScoreSceneControl : MonoBehaviour
     public TMP_Text playerNames;
     public TMP_Text playerScores;
 
+    public TMP_Text yourScores;
+
     string leaderboardID = "24260";
+    bool wait3sec = false;
 
     void Start()
     {
@@ -37,6 +40,17 @@ public class HighScoreSceneControl : MonoBehaviour
 
                 for (int i = 0; i < members.Length; i++)
                 {
+                    
+                    if (i == 0) { tempPlayerNames += "<color=#FFD700><b><size=+10>"; tempPlayerScores += "<color=#FFD700><b><size=+10>"; }
+                    if (i == 1) { tempPlayerNames += "<color=#FFFFFF><size=+5>"; tempPlayerScores += "<color=#FFFFFF><size=+5>"; }
+                    if (i == 2) { tempPlayerNames += "<color=#CD7F32><size=+3>"; tempPlayerScores += "<color=#CD7F32><size=+3>"; }
+                    if (i == 3) { tempPlayerNames += "<color=#666666></b><size=100%>"; tempPlayerScores += "<color=#666666></b><size=100%>"; }
+
+                    if (members[i].player.id.ToString() == PlayerPrefs.GetString("PlayerID"))
+                    {
+                        tempPlayerNames += "<u>"; tempPlayerScores += "<u>";
+                    }
+
                     if (members[i].player.name != "")
                     {
                         tempPlayerNames += members[i].player.name;
@@ -45,13 +59,21 @@ public class HighScoreSceneControl : MonoBehaviour
                     {
                         tempPlayerNames += members[i].player.id;
                     }
-                    tempPlayerScores += members[i].score + "\n";
-                    tempPlayerNames += "\n";
+                    tempPlayerScores += members[i].score + "\n</u>";
+                    tempPlayerNames += "\n</u>";
                 }
                 done = true;
 
                 playerNames.text = tempPlayerNames;
                 playerScores.text = tempPlayerScores;
+                if (Game.Control.score <= members[members.Length - 1].score)
+                {
+                    yourScores.text = "YOUR SCORE: " + Game.Control.score;
+                }
+                else
+                {
+                    yourScores.text = " ";
+                }
             }
             else
             {
@@ -60,6 +82,8 @@ public class HighScoreSceneControl : MonoBehaviour
             }
         });
         yield return new WaitWhile(() => done == false);
+        yield return new WaitForSecondsRealtime(3);
+        wait3sec = true;
     }
 
     IEnumerator LoginRoutine() //lootlocker login
@@ -81,12 +105,12 @@ public class HighScoreSceneControl : MonoBehaviour
             }
         });
 
-        yield return new WaitWhile(() => done = false);
+        yield return new WaitWhile(() => done == false);
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && wait3sec)
         {
             SceneManager.LoadScene(1);
         }

@@ -16517,6 +16517,7 @@ GameObject:
   - component: {fileID: 817894640}
   - component: {fileID: 817894642}
   - component: {fileID: 817894641}
+  - component: {fileID: 817894643}
   m_Layer: 5
   m_Name: TimerText
   m_TagString: Untagged
@@ -16640,6 +16641,27 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 817894639}
   m_CullTransparentMesh: 1
+--- !u!95 &817894643
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 817894639}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: da6620f0c4c253e45becd6e7d087cb17, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &830238465
 GameObject:
   m_ObjectHideFlags: 0
@@ -25745,6 +25767,7 @@ MonoBehaviour:
   scoreText: {fileID: 1551364820}
   healthText: {fileID: 607901050}
   timerText: {fileID: 817894641}
+  timerTextGO: {fileID: 817894639}
   itemText: {fileID: 222999442}
   NPC: {fileID: 5564821823126260785, guid: 694c82985349135458ee7d968a250c60, type: 3}
   door: {fileID: 71059356}

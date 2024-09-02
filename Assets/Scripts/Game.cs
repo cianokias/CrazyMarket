@@ -24,6 +24,7 @@ public class Game : MonoBehaviour
     public TMP_Text scoreText;
     public TMP_Text healthText;
     public TMP_Text timerText;
+    public GameObject timerTextGO;
     public TMP_Text itemText;
     public GameObject NPC;
     public GameObject door;
@@ -126,6 +127,10 @@ public class Game : MonoBehaviour
         {
             timer -=  Time.deltaTime;
             if (!recovering && !gamePaused) timerText.text = timer.ToString("00.000");
+
+            if (timer < 11) timerTextGO.GetComponent<Animator>().SetTrigger("countdown");
+                else timerTextGO.GetComponent<Animator>().SetTrigger("normal");
+
             if (timer <= 0) { timer = 0; gameEnd(); }
         }
 
@@ -182,6 +187,7 @@ public class Game : MonoBehaviour
     void gameEnd()
     {
         timerText.text = "GAME OVER";
+        timerTextGO.GetComponent<Animator>().SetTrigger("end");
         gameOver = true;
         Time.timeScale = 0f;
         StartCoroutine("SubmitScoreRoutine");

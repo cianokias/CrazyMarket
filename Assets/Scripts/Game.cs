@@ -26,6 +26,7 @@ public class Game : MonoBehaviour
     public TMP_Text timerText;
     public TMP_Text itemText;
     public GameObject NPC;
+    public GameObject door;
 
     [Header("MapInfo")]
     public int mapHeight;
@@ -92,6 +93,8 @@ public class Game : MonoBehaviour
 
     IEnumerator StartTimer() 
     {
+        yield return new WaitForSeconds(1f);
+        door.GetComponent<Animator>().SetTrigger("open");
         yield return new WaitForSeconds(2f);
         gamePaused = false;
 
@@ -204,6 +207,7 @@ public class Game : MonoBehaviour
         yield return new WaitWhile(() => uploadScore == false);
         yield return new WaitForSecondsRealtime(3);
         wait3sec = true;
+        timerText.text = "PRESS SPACE";
     }
 
     public void updateScore(int scoreToAdd)
@@ -226,9 +230,9 @@ public class Game : MonoBehaviour
 
     public void displayOHT(string textToDisplay, Vector3 targetPosition)
     {
-        Vector3 position = Camera.main.WorldToScreenPoint(targetPosition);
+        //Vector3 position = Camera.main.WorldToScreenPoint(targetPosition);
         OverHeadText newOHT = Instantiate(ohtPrefeb, canvas.transform).GetComponent<OverHeadText>();
         newOHT.tmpText.text = textToDisplay;
-        newOHT.screenPosition = position;
+        newOHT.screenPosition = targetPosition;
     }
 }

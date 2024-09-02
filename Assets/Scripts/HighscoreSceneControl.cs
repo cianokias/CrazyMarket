@@ -12,6 +12,7 @@ public class HighScoreSceneControl : MonoBehaviour
     public TMP_Text yourScores;
 
     public GameObject door;
+    public GameObject restartText;
 
     string leaderboardID = "24260";
     bool wait3sec = false;
@@ -85,6 +86,7 @@ public class HighScoreSceneControl : MonoBehaviour
         yield return new WaitWhile(() => done == false);
         yield return new WaitForSecondsRealtime(3);
         wait3sec = true;
+        restartText.SetActive(true);
     }
 
     IEnumerator LoginRoutine() //lootlocker login

@@ -20056,7 +20056,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: -6
   m_Sprite: {fileID: 2002747750, guid: fcb7f4ed160c1f446b34dacf19d6380d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -25747,10 +25747,11 @@ MonoBehaviour:
   timerText: {fileID: 817894641}
   itemText: {fileID: 222999442}
   NPC: {fileID: 5564821823126260785, guid: 694c82985349135458ee7d968a250c60, type: 3}
+  door: {fileID: 71059356}
   mapHeight: 0
   mapWidth: 0
   objs: {fileID: 1934687585}
-  timer: 52
+  timer: 53
   ohtPrefeb: {fileID: 2527758437893256356, guid: 5cb6220ce40d0e84286b62773d230e82, type: 3}
   canvas: {fileID: 1514367444}
   leaderboardID: 24260
@@ -29290,7 +29291,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 519420031}
-  m_PlaneDistance: 1
+  m_PlaneDistance: 10
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -39035,7 +39036,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -8
   m_Sprite: {fileID: 21300000, guid: 2c258d90f46cbe04ab17c80efdecf1f5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

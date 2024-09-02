@@ -17,6 +17,7 @@ public class Game : MonoBehaviour
     public bool secondLife = false;
     public bool recovering = false;
     public bool gameOver = false;
+    public bool gamePaused = true;
     public Vector2 startPoint = Vector2.zero;
 
     [Header("GameObjects")]
@@ -89,9 +90,16 @@ public class Game : MonoBehaviour
         updateScore(0);
     }
 
-    IEnumerator StartTimer() //NPC generate timer
+    IEnumerator StartTimer() 
     {
-        while (!gameOver)
+        yield return new WaitForSeconds(2f);
+        gamePaused = false;
+
+        //init npc
+        Instantiate(NPC, new Vector3(15, 1), NPC.transform.rotation);
+        Instantiate(NPC, new Vector3(1, 13), NPC.transform.rotation);
+
+        while (!gameOver)//NPC generate timer
         {
             yield return new WaitForSeconds(1.0f);
             npcTimer -= 1;
@@ -114,7 +122,7 @@ public class Game : MonoBehaviour
         if (!gameOver)
         {
             timer -=  Time.deltaTime;
-            if (!recovering) timerText.text = timer.ToString("00.000");
+            if (!recovering && !gamePaused) timerText.text = timer.ToString("00.000");
             if (timer <= 0) { timer = 0; gameEnd(); }
         }
 

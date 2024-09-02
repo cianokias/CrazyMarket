@@ -54,7 +54,7 @@ public class PlayerControl : MonoBehaviour
         sr.sortingOrder = (14 - (int)transform.position.y) * 2 + 1;
         
         //move logic
-        if (canMove && !isMoving && !Game.Control.recovering)
+        if (canMove && !isMoving && !Game.Control.recovering && !Game.Control.gamePaused)
         {
             moveDirection = Vector2.zero;
 

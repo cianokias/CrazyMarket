@@ -9,8 +9,9 @@ public class HighScoreSceneControl : MonoBehaviour
 {
     public TMP_Text playerNames;
     public TMP_Text playerScores;
-
     public TMP_Text yourScores;
+
+    public GameObject door;
 
     string leaderboardID = "24260";
     bool wait3sec = false;
@@ -112,7 +113,14 @@ public class HighScoreSceneControl : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) && wait3sec)
         {
-            SceneManager.LoadScene(1);
+            StartCoroutine(loadMainScene());
         }
+    }
+
+    IEnumerator loadMainScene()
+    {
+        door.SetActive(true);
+        yield return new WaitForSecondsRealtime(1.2f);
+        SceneManager.LoadScene(1);
     }
 }

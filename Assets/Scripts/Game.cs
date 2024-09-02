@@ -77,7 +77,7 @@ public class Game : MonoBehaviour
         updateItem(item >= 3 ? -3 : -item);
 
         player.SetActive(false);
-        healthText.text = "LAST CHANCE";
+        timerText.text = "LAST CHANCE";
         secondLife = true;
         yield return new WaitForSeconds(1.0f);
         player.transform.position = startPoint;
@@ -89,7 +89,7 @@ public class Game : MonoBehaviour
         updateScore(0);
     }
 
-    IEnumerator StartTimer()
+    IEnumerator StartTimer() //NPC generate timer
     {
         while (!gameOver)
         {
@@ -114,8 +114,8 @@ public class Game : MonoBehaviour
         if (!gameOver)
         {
             timer -=  Time.deltaTime;
+            if (!recovering) timerText.text = timer.ToString("00.000");
             if (timer <= 0) { timer = 0; gameEnd(); }
-            timerText.text = timer.ToString("00.000");
         }
 
         if (gameOver && uploadScore && wait3sec)
@@ -170,7 +170,7 @@ public class Game : MonoBehaviour
 
     void gameEnd()
     {
-        healthText.text = "GAME OVER";
+        timerText.text = "GAME OVER";
         gameOver = true;
         Time.timeScale = 0f;
         StartCoroutine("SubmitScoreRoutine");
@@ -201,19 +201,19 @@ public class Game : MonoBehaviour
     public void updateScore(int scoreToAdd)
     { 
         score += scoreToAdd;
-        scoreText.text = "SCORE " + score.ToString("00000");
+        scoreText.text = score.ToString("00000");
     }
 
     public void updateHealth(int healthToAdd)
     {
         health += healthToAdd;
-        healthText.text = "HP " + health.ToString();
+        healthText.text = health.ToString();
     }
 
     public void updateItem(int itemToAdd)
     {
         item += itemToAdd;
-        itemText.text = "Item " + item.ToString("00");
+        itemText.text = item.ToString("00");
     }
 
     public void displayOHT(string textToDisplay, Vector3 targetPosition)

@@ -7,7 +7,7 @@ public class PlayerControl : MonoBehaviour
 {
     //Movement vars
     Vector2 destination = new Vector2(0,0);
-    Vector2 moveDirection = new Vector2(0,0);
+    public Vector2 moveDirection = new Vector2(0,0);
     Vector2 faceDirection = new Vector2(0, 0);
     bool canMove = true;
     bool isMoving = false;

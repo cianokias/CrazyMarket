@@ -24,7 +24,6 @@ public class NPCState
     /// <param name="args"></param>
     public virtual void OnEnterState(NPCStateType lastState, object args = null)
     {
-
     }
 
     /// <summary>
@@ -46,8 +45,9 @@ public class NPCState
 
 public enum NPCStateType
 {
-    Empty,
     Stay,
     Chase,
     Spread,
+    Wander,
+    Surround,
 }

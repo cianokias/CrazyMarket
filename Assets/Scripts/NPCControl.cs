@@ -9,13 +9,15 @@ public class NPCContol : MonoBehaviour
 {
     public float speed = 1.5f;
     public int score = 0;
+    public float aggresive;
 
     List<Vector3> astarPath;
     //Movement vars
     Vector2 destination = new Vector2(0, 0);
     Vector2 moveDirection = new Vector2(0, 0);
     Vector2 faceDirection = new Vector2(0, 0);
-    bool canMove = true;
+    public bool canMove = true;
+    
     bool isMoving=false;
     bool blocked = false;
 
@@ -87,8 +89,8 @@ public class NPCContol : MonoBehaviour
     SpriteRenderer sr;
 
     NPCState curState = null;
-    List<NPCState> states = new List<NPCState>() {new State_Stay(),new State_Chase(),new State_Spread() };
-
+    List<NPCState> states = new List<NPCState>() {new State_Stay(),new State_Chase(),new State_Spread(),new State_Surround(),new State_Wander() };
+    public NPCStateType curType;
     void Start()
     {
         if (states.Count<=0)
@@ -101,9 +103,11 @@ public class NPCContol : MonoBehaviour
         {
             state.Init(this);
         }
-        curState=states[0];
 
-        speed = speed +( Random.value-0.5f)*2;
+        curState = states[0];
+        ChangeState(curState,NPCStateType.Stay);
+
+        speed = speed +( Random.value-0.5f)*1.5f;
         wallLayer = LayerMask.GetMask("Wall");
         boxLayer = LayerMask.GetMask("Box");
         astarPath= new List<Vector3>();
@@ -112,10 +116,14 @@ public class NPCContol : MonoBehaviour
 
     void Update()
     {
-
+        curType = curState.type;
         curState.Refresh();
 
-
+        for (int i = 0; i < astarPath.Count - 1; i++)
+        {
+            Debug.DrawLine(astarPath[i], astarPath[i + 1], Color.red);
+        }
+        /*
         for (int i = 0; i < astarPath.Count-1; i++)
         {
             Debug.DrawLine(astarPath[i], astarPath[i + 1],Color.red);
@@ -139,80 +147,15 @@ public class NPCContol : MonoBehaviour
             transform.position= Vector2.MoveTowards(transform.position, destination, speed * Time.deltaTime);
 
         }
-
-/*        if (health<=0)
-        {
-            Die();
-        }*/
-
-        /*
-         //move to destination
-        transform.position = Vector2.MoveTowards(transform.position, destination, 5 * Time.deltaTime);
-        //check if at destination
-        if ((Vector2)transform.position == destination) { isMoving = false; }
-
-        //move logic
-        if (canMove && !isMoving)
-        {
-            moveDirection = Vector2.zero;
-
-            
-            if (Vector2.Distance( destination-(Vector2)transform.position,Vector2.right)<0.05)
-            {
-                moveDirection = Vector2.right;
-            }
-            else if (Vector2.Distance(destination - (Vector2)transform.position, Vector2.left) < 0.05)
-            {
-                moveDirection = Vector2.left;
-            }
-            else if (Vector2.Distance(destination - (Vector2)transform.position, Vector2.up) < 0.05)
-            {
-                moveDirection = Vector2.up;
-            }
-            else if (Vector2.Distance(destination - (Vector2)transform.position, Vector2.down) < 0.05)
-            {
-                moveDirection = Vector2.down;
-            }
-
-            //if there is a input
-            if (moveDirection != Vector2.zero)
-            {
-                faceDirection = moveDirection; //for push box checking and future animation
-
-                // Raycast to check the wall
-                RaycastHit2D hit = Physics2D.Raycast(transform.position, moveDirection, rayDistance, wallLayer | boxLayer);
-
-                if (hit.collider == null)
+        */
+        /*        if (health<=0)
                 {
-                    // no wall, can move
-                    destination += moveDirection;
-                    canMove = false;
-                    isMoving = true;
-                    StartCoroutine("moving");
-                }
-            }
-        }
-        */
-        /*
-        //push the box/////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, faceDirection, rayDistance, boxLayer);
+                    Die();
+                }*/
 
-            if (hit.collider != null)
-            {
-                BoxControl hitObjectControl = hit.collider.gameObject.GetComponent<BoxControl>();
-                hitObjectControl.isPushed = true;
-                hitObjectControl.moveDirection = faceDirection;
-            }
-        }
-        */
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        
-    }
+
 
     IEnumerator stoping()
     {
@@ -319,6 +262,21 @@ public class NPCContol : MonoBehaviour
         }
     }
 
+    public void ChangeState(NPCState nowState, NPCStateType nextStateType, object args = null)
+    {
+        nowState.OnLeaveState();
+        foreach(var state in states)
+        {
+            if (state.type == nextStateType)
+            {
+                state.OnEnterState(nextStateType,args);
+                curState= state;
+                return;
+            }
+        }
+        Debug.LogError($"{transform.name}未找到状态{nextStateType}");
+    }
+
     private class Node
     {
         public int f,g;
@@ -340,8 +298,9 @@ public class NPCContol : MonoBehaviour
             return Mathf.Abs((n1.pos - n2.pos).x)+Mathf.Abs((n1.pos - n2.pos).y);
         }
     }
-    private Vector2 AStarPathFind(Vector2Int targetPos)
+    public Vector2 AStarPathFind(Vector2 inputPos)
     {
+        Vector2Int targetPos = new Vector2Int((int)(inputPos.x+0.5f), (int)(inputPos.y + 0.5f));
         Node targetNode = new Node(targetPos.x,targetPos.y);
         targetNode.parent = null;
 
@@ -351,26 +310,6 @@ public class NPCContol : MonoBehaviour
         Node startNode = new Node((int)(transform.position.x + 0.5), (int)(transform.position.y + 0.5));
         openList.Add(new Node(startNode.pos.x, startNode.pos.y));
         List<Vector2Int> direction=new List<Vector2Int>() { Vector2Int.up,Vector2Int.down,Vector2Int.left,Vector2Int.right};
-        /*
-        for(int i = 0;i<4;i++)//Add pos around curPos
-        {
-            int x = startNode.pos.x + direction[i].x,y= startNode.pos.y+direction[i].y;
-            if (x == 0 || x == 16 || y == 0 || y == 16 )
-            {
-                continue;
-            }
-            else if (MapInfo[x,y]>0)
-            {
-                continue;
-            }
-            Node node= new Node(x, y, startNode);
-            node.g = 1;
-            node.f = node.g + Node.HValue(node,targetNode);
-            openList.Add(node);
-        }
-        closeList.Add(startNode);
-        openList.Remove(startNode);
-        */
         //Path Sorting
         for (int findTime = 0; openList.Count > 0; findTime++)
         {
@@ -387,18 +326,19 @@ public class NPCContol : MonoBehaviour
             for (int i = 0; i < 4; i++)
             {
                 int x = node.pos.x + direction[i].x, y = node.pos.y + direction[i].y;
-                Node nextNode=new Node(x, y, node);
-                nextNode.g = node.f+MapInfo[x,y]+1;
 
-                if (x == 0 || x == 16 || y == 0 || y == 16)//检测是否到达边界
+                if (x <= 0 || x > Game.Control.mapWidth || y <= 0 || y >Game.Control.mapHeight)//检测是否到达边界
                 {
                     continue;
                 }
-                else if (MapInfo[x, y] >100)//检测是否有障碍物
+                else if (MapInfo[x, y] > 100)//检测是否有障碍物
                 {
-                    Debug.Log($"Skip box {MapInfo[x,y]}");
-                    continue;
+                    //By removing this line, NPC will regard box as movable.
+                    //continue;
                 }
+
+                Node nextNode=new Node(x, y, node);
+                nextNode.g = node.f+MapInfo[x,y]+1;                
 
                 if (nextNode.pos == targetNode.pos)//检测是否找到终点
                 {
@@ -449,7 +389,7 @@ public class NPCContol : MonoBehaviour
 
         if(targetNode.parent is null)
         {
-            Debug.LogError($"{transform.name}未能找到通路！");
+            Debug.LogError($"{transform.name}未能找到到达{targetNode.pos}的通路！");
             return startNode.pos;
         }
 

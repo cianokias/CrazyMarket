@@ -19,11 +19,23 @@ public class Game : MonoBehaviour
     public bool gameOver = false;
     public Vector2 startPoint = Vector2.zero;
 
+    [SerializeField]
+    private float _hazardLevel=0.5f;
+    public float HazardLevel // normally should be within [0,1], it will be a hard time when it rises more than 1
+    {
+        get
+        {
+            //TODO: Changing according to score.
+            return _hazardLevel;
+        }
+    }
+    
     [Header("GameObjects")]
     public TMP_Text scoreText;
     public TMP_Text healthText;
     public TMP_Text timerText;
     public TMP_Text itemText;
+    public Transform NPCList;
     public GameObject NPC;
 
     [Header("MapInfo")]
@@ -51,9 +63,9 @@ public class Game : MonoBehaviour
 
         //Setting the map size. Should be manually set if need to auto generate map 
         var bound = GameObject.Find("Boundary");
-        mapHeight =(int) (bound.transform.Find("H UP").GetChild(0).position.y - bound.transform.Find("H Down").GetChild(0).position.y)+1;
-        mapWidth = (int)(bound.transform.Find("V Right").GetChild(0).position.x - bound.transform.Find("V Left").GetChild(0).position.x)+1;
-        mapInfo = new int[mapWidth,mapHeight];
+        mapHeight =(int) (bound.transform.Find("H UP").GetChild(0).position.y - bound.transform.Find("H Down").GetChild(0).position.y)-1;
+        mapWidth = (int)(bound.transform.Find("V Right").GetChild(0).position.x - bound.transform.Find("V Left").GetChild(0).position.x)-1;
+        mapInfo = new int[mapWidth+2,mapHeight+2];
         RefreshMapInfo();
     }
 
@@ -98,11 +110,11 @@ public class Game : MonoBehaviour
             if (npcTimer <= 0)
             {
                 npcTimer = 10;
-                Instantiate(NPC,
+                var n= Instantiate(NPC,
                             new Vector3(player.transform.position.x >= 8 ? 1 : 15,
                                         player.transform.position.y >= 7 ? 1 : 13),
                             NPC.transform.rotation);
-            
+                n.transform.SetParent(NPCList);
             }
         }
     }

@@ -13,6 +13,7 @@ public class NPC_SceneControl : MonoBehaviour
     List <GameObject> NPCs;
     public int NPC_Num = 3;
     public float NPC_Speed=2;
+    public float DangerRate=0.5f;
 
     public int[,] MapInfo;
 

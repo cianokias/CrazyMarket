@@ -11,6 +11,10 @@ public class StartSceneControl : MonoBehaviour
     public TMP_InputField nameInputField;
     public GameObject nameInputGO;
 
+    public GameObject blackscreen;
+    public GameObject startscreen1;
+    public GameObject tips2;
+
     bool isLogin = false;
     bool triggerOnce = true;
     bool readyToStart = false;
@@ -51,8 +55,9 @@ public class StartSceneControl : MonoBehaviour
         if (isLogin && triggerOnce)
         {
             triggerOnce = false;
-            tipsText.text = "Please Enter Your Name:";
+            tipsText.text = " ";
             nameInputGO.SetActive(true);
+            blackscreen.GetComponent<Animator>().SetTrigger("blackout");
         }
 
         if (readyToStart && Input.GetKeyDown(KeyCode.Space))
@@ -64,8 +69,9 @@ public class StartSceneControl : MonoBehaviour
 
     public void SetPlayerName()
     {
-        tipsText.text = "Loading...";
+        tipsText.text = " ";
         nameInputGO.SetActive(false);
+        tips2.SetActive(true);
         StartCoroutine("setName");
     }
 
@@ -87,7 +93,10 @@ public class StartSceneControl : MonoBehaviour
         });
         yield return new WaitWhile(() => done == false);
         yield return new WaitForSeconds(1);
-        tipsText.text = "PRESS SPACE TO START";
+        //tipsText.text = "PRESS SPACE TO START";
+        tips2.SetActive(false);
+        startscreen1.GetComponent<Animator>().SetTrigger("start");
+        yield return new WaitForSeconds(1);
         readyToStart = true;
     }
 }

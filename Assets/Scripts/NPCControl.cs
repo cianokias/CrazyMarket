@@ -123,6 +123,9 @@ public class NPCContol : MonoBehaviour
         anim.SetBool("isMoving",isMoving);
         anim.SetInteger("direction",VectorToDir(moveDirection));
 
+        //update sortingorder
+        sr.sortingOrder = (14 - (int)transform.position.y) * 2 + 1;
+
         curType = curState.type;
         curState.Refresh();
 

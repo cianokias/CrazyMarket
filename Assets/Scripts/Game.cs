@@ -112,8 +112,8 @@ public class Game : MonoBehaviour
         gamePaused = false;
 
         //init npc
-        Instantiate(NPC, new Vector3(15, 1), NPC.transform.rotation);
-        Instantiate(NPC, new Vector3(1, 13), NPC.transform.rotation);
+        Instantiate(NPC, new Vector3(15, 1), NPC.transform.rotation, NPCList);
+        Instantiate(NPC, new Vector3(1, 13), NPC.transform.rotation, NPCList);
 
         while (!gameOver)//NPC generate timer
         {
@@ -122,11 +122,11 @@ public class Game : MonoBehaviour
             if (npcTimer <= 0)
             {
                 npcTimer = 10;
-                var n= Instantiate(NPC,
+                Instantiate(NPC,
                             new Vector3(player.transform.position.x >= 8 ? 1 : 15,
                                         player.transform.position.y >= 7 ? 1 : 13),
-                            NPC.transform.rotation);
-                n.transform.SetParent(NPCList);
+                            NPC.transform.rotation,
+                            NPCList);
             }
         }
     }

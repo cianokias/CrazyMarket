@@ -26179,7 +26179,7 @@ MonoBehaviour:
   timerText: {fileID: 817894641}
   timerTextGO: {fileID: 817894639}
   itemText: {fileID: 222999442}
-  NPCList: {fileID: 0}
+  NPCList: {fileID: 1983278388}
   NPC: {fileID: 5564821823126260785, guid: 694c82985349135458ee7d968a250c60, type: 3}
   door: {fileID: 71059356}
   HP_icon:
@@ -37605,7 +37605,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1983278388}
   m_Layer: 0
-  m_Name: NPCList
+  m_Name: NPC List
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

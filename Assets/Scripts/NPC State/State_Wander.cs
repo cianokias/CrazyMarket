@@ -31,6 +31,7 @@ public class State_Wander : NPCState
     public override void OnLeaveState()
     {
         base.OnLeaveState();
+        npc.isMoving = false;
     }
     public override void Refresh()
     {
@@ -39,11 +40,15 @@ public class State_Wander : NPCState
         if (stateCount >= wanderCount)
         {
             ThinkNextStep();
+            return;
         }
 
         if(Vector2.Distance(nextPos, npc.transform.position) < 0.5f)
         {
             npc.transform.position = nextPos;
+
+            //TODO:Add Wait Time;
+
             List<Vector2> direction = new List<Vector2>() { Vector2.down, Vector2.up, Vector2.left, Vector2.right };
             int i = new Randomer().nextInt(0, 4);
             for (int j = 0; j < 4; j++)
@@ -60,7 +65,12 @@ public class State_Wander : NPCState
         else
         {
             if (Game.Control.mapInfo[(int)nextPos.x, (int)nextPos.y] > 100)
+            {
+                //TODO:Add Path find
                 return;
+            }
+            npc.isMoving = true;
+            npc.moveDirection=nextPos-(Vector2)npc.transform.position;
             npc.transform.position = Vector2.MoveTowards(npc.transform.position, nextPos, wanderSpeed * Time.deltaTime);
         }
 

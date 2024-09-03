@@ -14,11 +14,14 @@ public class NPCContol : MonoBehaviour
     List<Vector3> astarPath;
     //Movement vars
     Vector2 destination = new Vector2(0, 0);
-    Vector2 moveDirection = new Vector2(0, 0);
-    Vector2 faceDirection = new Vector2(0, 0);
-    public bool canMove = true;
     
-    bool isMoving=false;
+    //Vector2 faceDirection = new Vector2(0, 0);
+
+    public bool canMove = true;
+    public Vector2 moveDirection = new Vector2(0, 0);
+    Animator anim;
+
+    public bool isMoving=false;
     bool blocked = false;
 
     float rayDistance = 1.0f;  // Raycast distance
@@ -112,10 +115,14 @@ public class NPCContol : MonoBehaviour
         boxLayer = LayerMask.GetMask("Box");
         astarPath= new List<Vector3>();
         sr = GetComponent<SpriteRenderer>();
+        anim=GetComponent<Animator>();
     }
 
     void Update()
     {
+        anim.SetBool("isMoving",isMoving);
+        anim.SetInteger("direction",VectorToDir(moveDirection));
+
         curType = curState.type;
         curState.Refresh();
 
@@ -155,7 +162,22 @@ public class NPCContol : MonoBehaviour
 
     }
 
-
+    int VectorToDir(Vector2 vec)
+    {
+        int dir=0;
+        vec= vec.normalized;
+        List<Vector2>directions=new List<Vector2>() { Vector2.down,Vector2.right,Vector2.up,Vector2.left};
+        float dis = 999;
+        for (int i = 0; i < directions.Count; i++) 
+        {
+            if (Vector2.Distance(directions[i], vec) < dis)
+            {
+                dis = Vector2.Distance(directions[i], vec);
+                dir= i;
+            }
+         }
+        return dir;
+    }
 
     IEnumerator stoping()
     {

@@ -53,6 +53,7 @@ public class State_Surround : NPCState
     public override void OnLeaveState()
     {
         base.OnLeaveState();
+        npc.isMoving = false;
     }
     public override void Refresh()
     {
@@ -61,6 +62,7 @@ public class State_Surround : NPCState
         if (counter >= surroundTime)
         {
             ThinkNextStep();
+            return;
         }
 
         if (Vector2.Distance(Game.Control.player.transform.position, npc.transform.position) < surroundRadius / 2)
@@ -91,7 +93,13 @@ public class State_Surround : NPCState
         else
         {
             if (Game.Control.mapInfo[(int)nextPos.x, (int)nextPos.y] > 100)
+            {
+                //TODO:Complete finding another route
                 return;
+            }
+            npc.isMoving = true;
+            npc.moveDirection = nextPos - (Vector2)npc.transform.position;
+            
             npc.transform.position = Vector2.MoveTowards(npc.transform.position, nextPos, speed * Time.deltaTime);
         }
 

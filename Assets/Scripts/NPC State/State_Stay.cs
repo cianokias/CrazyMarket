@@ -17,6 +17,8 @@ public class State_Stay : NPCState
     public override void OnEnterState(NPCStateType lastState, object args = null)
     {
         base.OnEnterState(lastState, args);
+        npc.isMoving= false;
+
         //StopTime = (float)args;
         float hazardLevel = 0;
         if (Game.Control is not null)

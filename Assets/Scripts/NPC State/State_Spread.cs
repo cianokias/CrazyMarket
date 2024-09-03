@@ -72,6 +72,7 @@ public class State_Spread : NPCState
     public override void OnLeaveState()
     {
         base.OnLeaveState();
+        npc.isMoving = false;
     }
     public override void Refresh()
     {
@@ -81,11 +82,13 @@ public class State_Spread : NPCState
         if (stateCount >= spreadTime)
         {
             ThinkNextStep();
+            return;
         }
 
         if (Vector2.Distance(npc.transform.position, nextPos) < 0.05f)//检测是否到达终点
         {
             npc.transform.position = nextPos;
+            npc.isMoving = false;
             if (nextPos == (checkoutPos + spreadPos))//npc has arrived
             {
                 Randomer rnd = new Randomer();
@@ -114,7 +117,13 @@ public class State_Spread : NPCState
         else
         {
             if (Game.Control.mapInfo[(int)nextPos.x, (int)nextPos.y] > 100)
+            {
+                //TODO: Complete finding another route
                 return;
+            }
+                
+            npc.moveDirection=nextPos-(Vector2)npc.transform.position; 
+            npc.isMoving=true;
             npc.transform.position = Vector2.MoveTowards(npc.transform.position, nextPos, spreadSpeed * Time.deltaTime);
         }
 

@@ -30,6 +30,7 @@ public class State_Chase : NPCState
     public override void OnLeaveState()
     {
         base.OnLeaveState();
+        npc.isMoving = false;
     }
     public override void Refresh()
     {
@@ -42,6 +43,7 @@ public class State_Chase : NPCState
         if (counter >= chaseTime)
         {
             ThinkNextStep();
+            return;
         }
 
         if (Vector2.Distance(npc.transform.position, TargetPos) < 0.05f)//检测是否到达终点
@@ -52,7 +54,13 @@ public class State_Chase : NPCState
         else
         {
             if (Game.Control.mapInfo[(int)TargetPos.x, (int)TargetPos.y] > 100)
+            {
+                //TODO: Add path find?
                 return;
+            }
+                
+            npc.isMoving=true;
+            npc.moveDirection=TargetPos-(Vector2)npc.transform.position;
             npc.transform.position = Vector2.MoveTowards(npc.transform.position, TargetPos, speed * Time.deltaTime);
         }
         

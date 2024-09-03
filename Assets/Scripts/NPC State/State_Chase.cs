@@ -93,7 +93,7 @@ public class State_Chase : NPCState
         }
         else//Select the dangerous way
         {
-            if (choice <= npc.aggresive)
+            if (choice >= npc.aggresive)
             {
                 npc.ChangeState(this, NPCStateType.Chase);
             }

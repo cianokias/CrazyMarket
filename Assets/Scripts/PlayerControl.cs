@@ -183,8 +183,8 @@ public class PlayerControl : MonoBehaviour
 
             Game.Control.updateScore(200);
             Game.Control.displayOHT("Score +200", pos);
-            Game.Control.updateHealth(1);
-            StartCoroutine(anotherOHT("HP +1", pos, 0.5f));
+            int t = Game.Control.updateHealth(1);
+            if (t == 1) StartCoroutine(anotherOHT("HP +1", pos, 0.5f));
 
             MusicPlayer.player.playAudio("powerUp");
         }

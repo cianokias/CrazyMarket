@@ -10,7 +10,7 @@ public class NPCContol : MonoBehaviour
     public float speed = 1.5f;
     public int score = 0;
     public float aggresive;
-
+    public Randomer rnd;
     List<Vector3> astarPath;
     //Movement vars
     Vector2 destination = new Vector2(0, 0);
@@ -106,10 +106,10 @@ public class NPCContol : MonoBehaviour
         {
             state.Init(this);
         }
-
+        rnd = new Randomer();
         curState = states[0];
         ChangeState(curState,NPCStateType.Stay);
-
+        
         speed = speed +( Random.value-0.5f)*1.5f;
         wallLayer = LayerMask.GetMask("Wall");
         boxLayer = LayerMask.GetMask("Box");

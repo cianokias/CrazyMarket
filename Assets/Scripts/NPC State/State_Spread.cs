@@ -12,7 +12,7 @@ public class State_Spread : NPCState
     Vector2 checkoutPos;
     Vector2 spreadPos;
     Vector2 nextPos;
-
+    
 
     public override void Init(NPCContol n, object args = null)
     {
@@ -32,6 +32,8 @@ public class State_Spread : NPCState
         npc.aggresive = 0;
         stateCount= 0;
         spreadTime= GetSpreadTime();
+        if (args is not null)
+            spreadTime = (int)args;
         spreadRadius= GetSpreadRadius();
         spreadSpeed=GetSpeed();
 
@@ -134,7 +136,7 @@ public class State_Spread : NPCState
 
     Vector2 GetRandomDiamondEmptyPos(int radius, Vector2 centerPos)
     {
-        Randomer rnd= new Randomer();
+        
         Vector2 emptyPos=new Vector2();
         List<Vector2 > possibleList=new List<Vector2>();
         for (int y = radius; y >= 0; y--)
@@ -145,7 +147,7 @@ public class State_Spread : NPCState
                 {
                     continue;
                 }
-                if (Game.Control.mapInfo[x, y] < 100)
+                if (Game.Control.mapInfo[x + (int)centerPos.x, y + (int)centerPos.y] < 100)
                 {
                     possibleList.Add(new Vector2(x, y));
                 }
@@ -154,7 +156,7 @@ public class State_Spread : NPCState
         
         while (possibleList.Count > 0)
         {
-            int id=rnd.nextInt(possibleList.Count);
+            int id=npc.rnd.nextInt(possibleList.Count);
             if (npc.AStarPathFind(possibleList[id] + centerPos)!=new Vector2((int)npc.transform.position.x+0.5f, (int)npc.transform.position.y + 0.5f))//This is a possible Path
             {
                 return possibleList[id];
@@ -169,8 +171,8 @@ public class State_Spread : NPCState
 
     void ThinkNextStep()
     {
-        Randomer rnd = new Randomer();
-        float choice = rnd.nextFloat();
+        
+        float choice = npc.rnd.nextFloat();
 
         if (choice >= (Game.Control.HazardLevel + 1) / 2)//Select the Safe way
         {

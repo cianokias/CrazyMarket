@@ -49,7 +49,7 @@ public class State_Wander : NPCState
             //TODO:Add Wait Time;
 
             List<Vector2> direction = new List<Vector2>() { Vector2.down, Vector2.up, Vector2.left, Vector2.right };
-            int i = new Randomer().nextInt(0, 4);
+            int i = npc.rnd.nextInt(0, 4);
             for (int j = 0; j < 4; j++)
             {
                 int x = (int)direction[i].x, y = (int)direction[i].y;
@@ -76,8 +76,7 @@ public class State_Wander : NPCState
     }
     void ThinkNextStep()
     {
-        Randomer rnd = new Randomer();
-        float choice = rnd.nextFloat();
+        float choice = npc.rnd.nextFloat();
 
         if (choice >= (Game.Control.HazardLevel + 1) / 2)//Select the Safe way
         {

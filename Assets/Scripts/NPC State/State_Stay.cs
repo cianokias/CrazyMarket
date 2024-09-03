@@ -51,8 +51,8 @@ public class State_Stay : NPCState
     void ThinkNextStep()
     {
         //For debug only
-        npc.ChangeState(this, NPCStateType.Surround,999);
-        return;
+        //npc.ChangeState(this, NPCStateType.Spread,999);
+        //return;
 
 
         float hazardLevel = 0;    

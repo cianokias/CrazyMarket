@@ -78,8 +78,7 @@ public class State_Chase : NPCState
 
     void ThinkNextStep()
     {
-        Randomer rnd = new Randomer();
-        float choice = rnd.nextFloat();
+        float choice = npc.rnd.nextFloat();
 
         if (choice >= (Game.Control.HazardLevel + 1) / 2)//Select the Safe way
         {

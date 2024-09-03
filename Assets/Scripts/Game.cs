@@ -113,6 +113,7 @@ public class Game : MonoBehaviour
 
         //init npc
         Instantiate(NPC, new Vector3(15, 1), NPC.transform.rotation, NPCList);
+        yield return new WaitForSeconds(0.25f);
         Instantiate(NPC, new Vector3(1, 13), NPC.transform.rotation, NPCList);
 
         while (!gameOver)//NPC generate timer

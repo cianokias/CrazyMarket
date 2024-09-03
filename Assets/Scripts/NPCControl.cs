@@ -9,33 +9,128 @@ public class NPCContol : MonoBehaviour
 {
     public float speed = 1.5f;
     public int score = 0;
+    public float aggresive;
 
     List<Vector3> astarPath;
     //Movement vars
     Vector2 destination = new Vector2(0, 0);
-    Vector2 moveDirection = new Vector2(0, 0);
-    Vector2 faceDirection = new Vector2(0, 0);
-    bool canMove = true;
-    bool isMoving=false;
+    
+    //Vector2 faceDirection = new Vector2(0, 0);
+
+    public bool canMove = true;
+    public Vector2 moveDirection = new Vector2(0, 0);
+    Animator anim;
+
+    public bool isMoving=false;
     bool blocked = false;
 
     float rayDistance = 1.0f;  // Raycast distance
     LayerMask wallLayer;       // wall layer
     LayerMask boxLayer;        // box layer
 
+    int[,] _mapinfo = null;
+    int[,] MapInfo
+    {
+        get
+        {
+            if (_mapinfo is null)
+            {
+                if (Game.Control is null)
+                {
+                    _mapinfo= GameObject.Find("NPC_SceneControl").GetComponent<NPC_SceneControl>().MapInfo;
+                }
+                else
+                {
+                    _mapinfo= Game.Control.mapInfo;
+                }
+            }
+                return _mapinfo;
+        }
+    }
+
+    GameObject _playerGO;
+    GameObject PlayerGO
+    {
+        get
+        {
+            if (_playerGO == null)
+            {
+                if(Game.Control is not null)
+                {
+                    _playerGO=Game.Control.player; 
+                }
+                else
+                {
+                    _playerGO = GameObject.Find("Player");
+                }
+            }
+            return _playerGO;
+
+        }
+    }
+
+    GameObject _obj;
+    GameObject Obj
+    {
+        get
+        {
+            if(_obj == null)
+            {
+                if( Game.Control is not null)
+                {
+                    _obj = Game.Control.objs;
+                }
+                else
+                {
+                    _obj = GameObject.Find("Obj");
+                }
+            }
+            return _obj;
+        }
+    }
+
     SpriteRenderer sr;
-   
+
+    NPCState curState = null;
+    List<NPCState> states = new List<NPCState>() {new State_Stay(),new State_Chase(),new State_Spread(),new State_Surround(),new State_Wander() };
+    public NPCStateType curType;
     void Start()
     {
+        if (states.Count<=0)
+        {
+            Debug.LogError($"{transform.name} has no state, and will not work!");
+            return;
+        }
+
+        foreach (var state in states)
+        {
+            state.Init(this);
+        }
+
+        curState = states[0];
+        ChangeState(curState,NPCStateType.Stay);
+
+        speed = speed +( Random.value-0.5f)*1.5f;
         wallLayer = LayerMask.GetMask("Wall");
         boxLayer = LayerMask.GetMask("Box");
         astarPath= new List<Vector3>();
         sr = GetComponent<SpriteRenderer>();
+        anim=GetComponent<Animator>();
     }
 
     void Update()
     {
+        anim.SetBool("isMoving",isMoving);
+        anim.SetInteger("direction",VectorToDir(moveDirection));
 
+        curType = curState.type;
+        curState.Refresh();
+
+        for (int i = 0; i < astarPath.Count - 1; i++)
+        {
+            Debug.DrawLine(astarPath[i], astarPath[i + 1], Color.red);
+        }
+        /*
         for (int i = 0; i < astarPath.Count-1; i++)
         {
             Debug.DrawLine(astarPath[i], astarPath[i + 1],Color.red);
@@ -59,79 +154,29 @@ public class NPCContol : MonoBehaviour
             transform.position= Vector2.MoveTowards(transform.position, destination, speed * Time.deltaTime);
 
         }
-
-/*        if (health<=0)
-        {
-            Die();
-        }*/
-
-        /*
-         //move to destination
-        transform.position = Vector2.MoveTowards(transform.position, destination, 5 * Time.deltaTime);
-        //check if at destination
-        if ((Vector2)transform.position == destination) { isMoving = false; }
-
-        //move logic
-        if (canMove && !isMoving)
-        {
-            moveDirection = Vector2.zero;
-
-            
-            if (Vector2.Distance( destination-(Vector2)transform.position,Vector2.right)<0.05)
-            {
-                moveDirection = Vector2.right;
-            }
-            else if (Vector2.Distance(destination - (Vector2)transform.position, Vector2.left) < 0.05)
-            {
-                moveDirection = Vector2.left;
-            }
-            else if (Vector2.Distance(destination - (Vector2)transform.position, Vector2.up) < 0.05)
-            {
-                moveDirection = Vector2.up;
-            }
-            else if (Vector2.Distance(destination - (Vector2)transform.position, Vector2.down) < 0.05)
-            {
-                moveDirection = Vector2.down;
-            }
-
-            //if there is a input
-            if (moveDirection != Vector2.zero)
-            {
-                faceDirection = moveDirection; //for push box checking and future animation
-
-                // Raycast to check the wall
-                RaycastHit2D hit = Physics2D.Raycast(transform.position, moveDirection, rayDistance, wallLayer | boxLayer);
-
-                if (hit.collider == null)
+        */
+        /*        if (health<=0)
                 {
-                    // no wall, can move
-                    destination += moveDirection;
-                    canMove = false;
-                    isMoving = true;
-                    StartCoroutine("moving");
-                }
-            }
-        }
-        */
-        /*
-        //push the box/////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, faceDirection, rayDistance, boxLayer);
+                    Die();
+                }*/
 
-            if (hit.collider != null)
-            {
-                BoxControl hitObjectControl = hit.collider.gameObject.GetComponent<BoxControl>();
-                hitObjectControl.isPushed = true;
-                hitObjectControl.moveDirection = faceDirection;
-            }
-        }
-        */
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    int VectorToDir(Vector2 vec)
     {
-        
+        int dir=0;
+        vec= vec.normalized;
+        List<Vector2>directions=new List<Vector2>() { Vector2.down,Vector2.right,Vector2.up,Vector2.left};
+        float dis = 999;
+        for (int i = 0; i < directions.Count; i++) 
+        {
+            if (Vector2.Distance(directions[i], vec) < dis)
+            {
+                dis = Vector2.Distance(directions[i], vec);
+                dir= i;
+            }
+         }
+        return dir;
     }
 
     IEnumerator stoping()
@@ -158,7 +203,7 @@ public class NPCContol : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Pickup" && Game.Control.recovering)
+        if (collision.gameObject.tag == "Pickup")
         {
             Destroy(collision.gameObject);
             score += 100;
@@ -180,7 +225,7 @@ public class NPCContol : MonoBehaviour
             for (int i = 0; i < 4; i++) 
             {
                 var checkpos = new Vector2Int((int)(transform.position.x + 0.5), (int)(transform.position.y + 0.5)) + direction[i];
-                if (Game.Control.mapInfo[checkpos.x, checkpos.y] == 0)
+                if (MapInfo[checkpos.x, checkpos.y] == 0)
                 {
                     blocked = false;
                     break;
@@ -192,9 +237,9 @@ public class NPCContol : MonoBehaviour
             return;
 
         //if player alive, chase player
-        if (Game.Control.player.activeSelf)
+        if (PlayerGO.activeSelf)
         {
-            Vector2Int playerPos = new Vector2Int((int)(Game.Control.player.transform.position.x+0.5), (int)(Game.Control.player.transform.position.y + 0.5));
+            Vector2Int playerPos = new Vector2Int((int)(PlayerGO.transform.position.x+0.5), (int)(PlayerGO.transform.position.y + 0.5));
             destination = AStarPathFind(playerPos);
             return;
         }
@@ -203,14 +248,14 @@ public class NPCContol : MonoBehaviour
         float nearPickupDis = 19260817;
         Vector2Int pickupPos = new Vector2Int();
         
-        for (int i = 0; i < Game.Control.objs.transform.childCount; i++) 
+        for (int i = 0; i < Obj.transform.childCount; i++) 
         {
-            if (Game.Control.objs.transform.GetChild(i).tag == "Pickup")
+            if (Obj.transform.GetChild(i).tag == "Pickup")
             {
-                if (Vector2.Distance(Game.Control.objs.transform.GetChild(i).position, transform.position) < nearPickupDis)
+                if (Vector2.Distance(Obj.transform.GetChild(i).position, transform.position) < nearPickupDis)
                 {
-                    nearPickupDis = Vector2.Distance(Game.Control.objs.transform.GetChild(i).position, transform.position);
-                    pickupPos =new Vector2Int((int)(Game.Control.objs.transform.GetChild(i).position.x+0.5), (int)(Game.Control.objs.transform.GetChild(i).position.y + 0.5)) ;
+                    nearPickupDis = Vector2.Distance(Obj.transform.GetChild(i).position, transform.position);
+                    pickupPos =new Vector2Int((int)(Obj.transform.GetChild(i).position.x+0.5), (int)(Obj.transform.GetChild(i).position.y + 0.5)) ;
                 }
             }
         }
@@ -226,7 +271,7 @@ public class NPCContol : MonoBehaviour
         
         destination = new Vector2Int((int)(transform.position.x+0.5), (int)(transform.position.y + 0.5)) + direction[d];
         int loop = 0;
-        while (Game.Control.mapInfo[(int)destination.x, (int)destination.y] >0 && loop < 6)
+        while (MapInfo[(int)destination.x, (int)destination.y] >0 && loop < 6)
         {
             loop++;
             d = (d + 1) % 4;
@@ -239,9 +284,24 @@ public class NPCContol : MonoBehaviour
         }
     }
 
+    public void ChangeState(NPCState nowState, NPCStateType nextStateType, object args = null)
+    {
+        nowState.OnLeaveState();
+        foreach(var state in states)
+        {
+            if (state.type == nextStateType)
+            {
+                state.OnEnterState(nextStateType,args);
+                curState= state;
+                return;
+            }
+        }
+        Debug.LogError($"{transform.name}未找到状态{nextStateType}");
+    }
+
     private class Node
     {
-        public int f,g,h;
+        public int f,g;
         
         public Vector2Int pos;
         public Node parent;
@@ -260,8 +320,9 @@ public class NPCContol : MonoBehaviour
             return Mathf.Abs((n1.pos - n2.pos).x)+Mathf.Abs((n1.pos - n2.pos).y);
         }
     }
-    private Vector2 AStarPathFind(Vector2Int targetPos)
+    public Vector2 AStarPathFind(Vector2 inputPos)
     {
+        Vector2Int targetPos = new Vector2Int((int)(inputPos.x+0.5f), (int)(inputPos.y + 0.5f));
         Node targetNode = new Node(targetPos.x,targetPos.y);
         targetNode.parent = null;
 
@@ -271,25 +332,6 @@ public class NPCContol : MonoBehaviour
         Node startNode = new Node((int)(transform.position.x + 0.5), (int)(transform.position.y + 0.5));
         openList.Add(new Node(startNode.pos.x, startNode.pos.y));
         List<Vector2Int> direction=new List<Vector2Int>() { Vector2Int.up,Vector2Int.down,Vector2Int.left,Vector2Int.right};
-        for(int i = 0;i<4;i++)//Add pos around curPos
-        {
-            int x = startNode.pos.x + direction[i].x,y= startNode.pos.y+direction[i].y;
-            if (x == 0 || x == 16 || y == 0 || y == 16 )
-            {
-                continue;
-            }
-            else if (Game.Control.mapInfo[x,y]>0)
-            {
-                continue;
-            }
-            Node node= new Node(x, y, startNode);
-            node.g = 1;
-            node.f = node.g + Node.HValue(node,targetNode);
-            openList.Add(node);
-        }
-        closeList.Add(startNode);
-        openList.Remove(startNode);
-
         //Path Sorting
         for (int findTime = 0; openList.Count > 0; findTime++)
         {
@@ -306,17 +348,19 @@ public class NPCContol : MonoBehaviour
             for (int i = 0; i < 4; i++)
             {
                 int x = node.pos.x + direction[i].x, y = node.pos.y + direction[i].y;
-                Node nextNode=new Node(x, y, node);
-                nextNode.g = node.f+1;
 
-                if (x == 0 || x == 16 || y == 0 || y == 16)//检测是否到达边界
+                if (x <= 0 || x > Game.Control.mapWidth || y <= 0 || y >Game.Control.mapHeight)//检测是否到达边界
                 {
                     continue;
                 }
-                else if (Game.Control.mapInfo[x, y] > 0)//检测是否有障碍物
+                else if (MapInfo[x, y] > 100)//检测是否有障碍物
                 {
-                    continue;
+                    //By removing this line, NPC will regard box as movable.
+                    //continue;
                 }
+
+                Node nextNode=new Node(x, y, node);
+                nextNode.g = node.f+MapInfo[x,y]+1;                
 
                 if (nextNode.pos == targetNode.pos)//检测是否找到终点
                 {
@@ -326,7 +370,7 @@ public class NPCContol : MonoBehaviour
                 }
 
                 bool flag = false;
-                for (int j = 0; j < closeList.Count; j++)//检测相邻节点是否在close中
+                for (int j = 0; j < closeList.Count; j++)//检测该节点是否在close中
                 {
                     if (closeList[j].pos == nextNode.pos)
                     {
@@ -335,9 +379,9 @@ public class NPCContol : MonoBehaviour
                     }
                 }
                 if(flag)continue;
-                flag = false;
 
-                for (int j = 0; j < openList.Count; j++)//检测是否有相邻节点在open中
+                flag = false;
+                for (int j = 0; j < openList.Count; j++)//检测该节点是否已存在于open中
                 {
                     if (openList[j].pos == nextNode.pos)
                     {
@@ -367,7 +411,7 @@ public class NPCContol : MonoBehaviour
 
         if(targetNode.parent is null)
         {
-            Debug.LogError($"{transform.name}未能找到通路！");
+            Debug.LogError($"{transform.name}未能找到到达{targetNode.pos}的通路！");
             return startNode.pos;
         }
 
@@ -381,7 +425,8 @@ public class NPCContol : MonoBehaviour
             log += $"{replayNode.parent.pos}->";
             replayNode = replayNode.parent;
         }
-
+        astarPath.Add(new Vector3(replayNode.pos.x, replayNode.pos.y));
+        astarPath.Add(new Vector3(startNode.pos.x, startNode.pos.y));
         return replayNode.pos;
     }
 }

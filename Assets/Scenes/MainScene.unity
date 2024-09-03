@@ -18835,6 +18835,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8473dfdfde236f4ab750897d55d5c33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveDirection: {x: 0, y: 0}
 --- !u!50 &952022004
 Rigidbody2D:
   serializedVersion: 4
@@ -26173,10 +26174,12 @@ MonoBehaviour:
   gameOver: 0
   gamePaused: 1
   startPoint: {x: 0, y: 0}
+  _hazardLevel: 0.5
   scoreText: {fileID: 1551364820}
   timerText: {fileID: 817894641}
   timerTextGO: {fileID: 817894639}
   itemText: {fileID: 222999442}
+  NPCList: {fileID: 0}
   NPC: {fileID: 5564821823126260785, guid: 694c82985349135458ee7d968a250c60, type: 3}
   door: {fileID: 71059356}
   HP_icon:
@@ -37592,6 +37595,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 45cdcc226aaf7a7449b769e5b247df34, type: 3}
+--- !u!1 &1983278387
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1983278388}
+  m_Layer: 0
+  m_Name: NPCList
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1983278388
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1983278387}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1983596054 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5928039505316875097, guid: 45cdcc226aaf7a7449b769e5b247df34, type: 3}
@@ -40609,6 +40643,7 @@ SceneRoots:
   - {fileID: 928159729}
   - {fileID: 1657187893}
   - {fileID: 1934687586}
+  - {fileID: 1983278388}
   - {fileID: 952022002}
   - {fileID: 1008417245}
   - {fileID: 71059358}

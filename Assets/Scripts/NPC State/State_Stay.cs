@@ -85,7 +85,8 @@ public class State_Stay : NPCState
             }
             else
             {
-                npc.ChangeState(this, NPCStateType.Surround);
+                npc.ChangeState(this, NPCStateType.Chase);
+                //npc.ChangeState(this, NPCStateType.Surround);
             }
         }
 

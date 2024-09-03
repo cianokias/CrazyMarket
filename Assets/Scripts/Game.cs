@@ -26,7 +26,7 @@ public class Game : MonoBehaviour
     {
         get
         {
-            //TODO: Changing according to score.
+            _hazardLevel = item / 5f + score / 3000f;
             return _hazardLevel;
         }
     }
@@ -45,6 +45,7 @@ public class Game : MonoBehaviour
     public int mapHeight;
     public int mapWidth;//Boundary included
     public GameObject objs;
+    int initObjNum;
     public int[,] mapInfo;
 
     [Header("Timer")]
@@ -112,9 +113,9 @@ public class Game : MonoBehaviour
         gamePaused = false;
 
         //init npc
-        Instantiate(NPC, new Vector3(15, 1), NPC.transform.rotation, NPCList);
+        Instantiate(NPC, new Vector3(15, 1), NPC.transform.rotation, NPCList).name+=Time.time.ToString("0.0");
         yield return new WaitForSeconds(0.25f);
-        Instantiate(NPC, new Vector3(1, 13), NPC.transform.rotation, NPCList);
+        Instantiate(NPC, new Vector3(1, 13), NPC.transform.rotation, NPCList).name += Time.time.ToString("0.0");
 
         while (!gameOver)//NPC generate timer
         {
@@ -127,7 +128,7 @@ public class Game : MonoBehaviour
                             new Vector3(player.transform.position.x >= 8 ? 1 : 15,
                                         player.transform.position.y >= 7 ? 1 : 13),
                             NPC.transform.rotation,
-                            NPCList);
+                            NPCList).name += Time.time.ToString("0.0");
             }
         }
     }
@@ -158,12 +159,12 @@ public class Game : MonoBehaviour
 
     }
 
-    void RefreshMapInfo()
+    public void RefreshMapInfo()
     {
         //Reset MapInfo
-        for (int i = 0; i < mapHeight; i++) 
+        for (int i = 0; i <= mapHeight; i++) 
         {
-            for (int j = 0; j < mapWidth; j++)
+            for (int j = 0; j <= mapWidth; j++)
             {
                 mapInfo[j, i] = 0;
             }
@@ -198,7 +199,7 @@ public class Game : MonoBehaviour
         for (int i = 0; i < npcs.childCount; i++)
         {
             int x = (int)(npcs.GetChild(i).transform.position.x+0.5f), y = (int)(npcs.GetChild(i).transform.position.y+0.5f);
-            mapInfo[(int)x, (int)y] = 4;
+            mapInfo[(int)x, (int)y] = 10;
         }
     }
 

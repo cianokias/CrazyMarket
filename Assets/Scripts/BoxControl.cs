@@ -114,7 +114,7 @@ public class BoxControl : MonoBehaviour
         MusicPlayer.player.playAudio("boxBreak");
         yield return new WaitForSeconds(0.2f);
         GetComponent<SpriteRenderer>().enabled = false;
-
+        Game.Control.RefreshMapInfo();
 
         /*if (isSpecialBox)
         {

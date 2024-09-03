@@ -42,6 +42,8 @@ public class State_Wander : NPCState
             return;
         }
 
+        wanderSpeed=GetWanderSpeed();
+
         if(Vector2.Distance(nextPos, npc.transform.position) < 0.5f)
         {
             npc.transform.position = nextPos;
@@ -97,6 +99,7 @@ public class State_Wander : NPCState
             }
             else
             {
+                //npc.ChangeState(this, NPCStateType.Chase);
                 npc.ChangeState(this, NPCStateType.Surround);
             }
         }

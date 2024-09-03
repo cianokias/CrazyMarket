@@ -22,6 +22,7 @@ public class NPCContol : MonoBehaviour
     Animator anim;
 
     public bool isMoving=false;
+    public Vector2 TargetPos;
     bool blocked = false;
 
     float rayDistance = 1.0f;  // Raycast distance
@@ -359,7 +360,7 @@ public class NPCContol : MonoBehaviour
                 else if (MapInfo[x, y] > 100)//检测是否有障碍物
                 {
                     //By removing this line, NPC will regard box as movable.
-                    //continue;
+                    continue;
                 }
 
                 Node nextNode=new Node(x, y, node);
@@ -414,7 +415,7 @@ public class NPCContol : MonoBehaviour
 
         if(targetNode.parent is null)
         {
-            Debug.LogError($"{transform.name}未能找到到达{targetNode.pos}的通路！");
+            Debug.Log($"{transform.name}未能找到到达{targetNode.pos}的通路！");
             return startNode.pos;
         }
 

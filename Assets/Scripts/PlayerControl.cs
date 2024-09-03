@@ -18,7 +18,7 @@ public class PlayerControl : MonoBehaviour
     LayerMask boxLayer;        // box layer
 
     //other
-    bool canBeHurt = true;
+    public  bool canBeHurt = true;
     float speedForOneBlock = 0.2f;
 
     //components

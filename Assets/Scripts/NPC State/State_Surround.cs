@@ -74,6 +74,8 @@ public class State_Surround : NPCState
             return;
         }
 
+        speed = GetSurroundSpeed();
+
         if (Vector2.Distance(Game.Control.player.transform.position, npc.transform.position) < surroundRadius / 2)//If player gets too close
         {
             Vector2 toVec=Game.Control.player.transform.position- npc.transform.position;
@@ -149,6 +151,7 @@ public class State_Surround : NPCState
             }
             else
             {
+                //npc.ChangeState(this, NPCStateType.Chase);
                 npc.ChangeState(this, NPCStateType.Surround);
             }
         }
@@ -156,6 +159,7 @@ public class State_Surround : NPCState
 
     Vector2 GetRandomDiamondEmptyPos(int radius, Vector2 centerPos)
     {
+        centerPos = new Vector2((int)centerPos.x + 0.5f, (int)centerPos.y);
         Vector2 emptyPos = new Vector2();
         List<Vector2> possibleList = new List<Vector2>();
         for (int y = radius; y >= 0; y--)

@@ -34,6 +34,7 @@ public class State_Spread : NPCState
         spreadTime= GetSpreadTime();
         if (args is not null)
             spreadTime = (int)args;
+
         spreadRadius= GetSpreadRadius();
         spreadSpeed=GetSpeed();
 
@@ -79,6 +80,7 @@ public class State_Spread : NPCState
     public override void Refresh()
     {
         base.Refresh();
+        npc.TargetPos = nextPos;
 
         stateCount += Time.deltaTime;
         if (stateCount >= spreadTime)
@@ -86,6 +88,8 @@ public class State_Spread : NPCState
             ThinkNextStep();
             return;
         }
+
+        spreadSpeed = GetSpeed();
 
         if (Vector2.Distance(npc.transform.position, nextPos) < 0.05f)//检测是否到达终点
         {
@@ -153,11 +157,25 @@ public class State_Spread : NPCState
                 }
             }
         }
-        
+        for (int y = -radius; y < 0; y++)
+        {
+            for (int x = -(radius + y); x <= (radius + y); x++)
+            {
+                if (x + centerPos.x <= 0 || y + centerPos.y <= 0 || x + centerPos.x > Game.Control.mapWidth || y + centerPos.y > Game.Control.mapHeight)//Touches border
+                {
+                    continue;
+                }
+                if (Game.Control.mapInfo[x + (int)centerPos.x, y + (int)centerPos.y] < 100)
+                {
+                    possibleList.Add(new Vector2(x, y));
+                }
+            }
+        }
+
         while (possibleList.Count > 0)
         {
             int id=npc.rnd.nextInt(possibleList.Count);
-            if (npc.AStarPathFind(possibleList[id] + centerPos)!=new Vector2((int)npc.transform.position.x+0.5f, (int)npc.transform.position.y + 0.5f))//This is a possible Path
+            if (Vector2.Distance(npc.AStarPathFind(possibleList[id] + centerPos), new Vector2((int)(npc.transform.position.x + 0.5f), (int)(npc.transform.position.y + 0.5f)))>=0.8f)//This is a possible Path
             {
                 return possibleList[id];
             }
@@ -193,6 +211,7 @@ public class State_Spread : NPCState
             }
             else
             {
+                //npc.ChangeState(this, NPCStateType.Chase);
                 npc.ChangeState(this, NPCStateType.Surround);
             }
         }

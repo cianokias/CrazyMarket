@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class State_Spread : NPCState
 {
@@ -47,7 +46,7 @@ public class State_Spread : NPCState
             }
         }
         checkoutPos=nearCheckout.transform.position;
-
+        /*
         Randomer rnd = new Randomer();
         int y = rnd.nextInt(-spreadRadius, spreadRadius + 1);
         int x = rnd.nextInt(-(spreadRadius - Mathf.Abs(y)), (spreadRadius - Mathf.Abs(y) + 1));
@@ -65,7 +64,8 @@ public class State_Spread : NPCState
             var pos = DidToXY(spreadRadius, id);
             x = (int)(pos.x); y = (int)(pos.y);
         }
-        spreadPos = new Vector2(x, y);
+        */
+        spreadPos = GetRandomDiamondEmptyPos(spreadRadius,checkoutPos);
         nextPos = npc.AStarPathFind(spreadPos + checkoutPos);
 
     }
@@ -91,6 +91,7 @@ public class State_Spread : NPCState
             npc.isMoving = false;
             if (nextPos == (checkoutPos + spreadPos))//npc has arrived
             {
+                /*
                 Randomer rnd = new Randomer();
                 int y = rnd.nextInt(-spreadRadius, spreadRadius + 1);
                 int x = rnd.nextInt(-(spreadRadius - Mathf.Abs(y)), (spreadRadius - Mathf.Abs(y) + 1));
@@ -108,7 +109,8 @@ public class State_Spread : NPCState
                     var pos = DidToXY(spreadRadius, id);
                     x = (int)(pos.x); y = (int)(pos.y);
                 }
-                spreadPos = new Vector2(x, y);
+                */
+                spreadPos = GetRandomDiamondEmptyPos(spreadRadius, checkoutPos);
                 nextPos = npc.AStarPathFind(spreadPos + checkoutPos);
             }
 
@@ -118,8 +120,8 @@ public class State_Spread : NPCState
         {
             if (Game.Control.mapInfo[(int)nextPos.x, (int)nextPos.y] > 100)
             {
-                //TODO: Complete finding another route
-                return;
+                spreadPos = GetRandomDiamondEmptyPos(spreadRadius, checkoutPos);
+                nextPos = npc.AStarPathFind(spreadPos + checkoutPos);                
             }
                 
             npc.moveDirection=nextPos-(Vector2)npc.transform.position; 
@@ -130,12 +132,47 @@ public class State_Spread : NPCState
 
     }
 
+    Vector2 GetRandomDiamondEmptyPos(int radius, Vector2 centerPos)
+    {
+        Randomer rnd= new Randomer();
+        Vector2 emptyPos=new Vector2();
+        List<Vector2 > possibleList=new List<Vector2>();
+        for (int y = radius; y >= 0; y--)
+        {
+            for (int x = -(radius - y); x <= (radius - y); x++)
+            {
+                if (x + centerPos.x <= 0 || y + centerPos.y <= 0 || x + centerPos.x > Game.Control.mapWidth || y + centerPos.y > Game.Control.mapHeight)//Touches border
+                {
+                    continue;
+                }
+                if (Game.Control.mapInfo[x, y] < 100)
+                {
+                    possibleList.Add(new Vector2(x, y));
+                }
+            }
+        }
+        
+        while (possibleList.Count > 0)
+        {
+            int id=rnd.nextInt(possibleList.Count);
+            if (npc.AStarPathFind(possibleList[id] + centerPos)!=new Vector2((int)npc.transform.position.x+0.5f, (int)npc.transform.position.y + 0.5f))//This is a possible Path
+            {
+                return possibleList[id];
+            }
+            possibleList.RemoveAt(id);            
+        }
+        Debug.Log($"Doesn't find empty space at {centerPos}, with radius {radius}");
+        return emptyPos;
+    }
+
+
+
     void ThinkNextStep()
     {
         Randomer rnd = new Randomer();
         float choice = rnd.nextFloat();
 
-        if (choice < Game.Control.HazardLevel)//Select the Safe way
+        if (choice >= (Game.Control.HazardLevel + 1) / 2)//Select the Safe way
         {
             if (choice <= Game.Control.HazardLevel / 2)
             {

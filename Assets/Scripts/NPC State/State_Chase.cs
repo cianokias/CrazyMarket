@@ -81,7 +81,7 @@ public class State_Chase : NPCState
         Randomer rnd = new Randomer();
         float choice = rnd.nextFloat();
 
-        if (choice < Game.Control.HazardLevel)//Select the Safe way
+        if (choice >= (Game.Control.HazardLevel + 1) / 2)//Select the Safe way
         {
             if (choice <= Game.Control.HazardLevel/ 2)
             {

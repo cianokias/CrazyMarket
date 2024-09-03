@@ -50,6 +50,11 @@ public class State_Stay : NPCState
 
     void ThinkNextStep()
     {
+        //For debug only
+        npc.ChangeState(this, NPCStateType.Surround,999);
+        return;
+
+
         float hazardLevel = 0;    
         if (Game.Control is not null)
             hazardLevel = Game.Control.HazardLevel;
@@ -61,9 +66,9 @@ public class State_Stay : NPCState
         Randomer rnd = new Randomer();
         float choice=rnd.nextFloat();        
 
-        if(choice < hazardLevel)//Select the Safe way
+        if(choice> hazardLevel)//Select the Safe way
         {
-            if (choice <= hazardLevel / 2)
+            if (choice >=( hazardLevel+1) / 2)
             {
                 npc.ChangeState(this, NPCStateType.Wander);
             }

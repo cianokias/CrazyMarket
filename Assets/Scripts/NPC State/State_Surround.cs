@@ -26,7 +26,11 @@ public class State_Surround : NPCState
         Debug.Log($"{npc.transform.name} changes to {type} state");
         speed = GetSurroundSpeed();
         surroundRadius = GetRadius();
-        surroundTime =
+        surroundTime =GetSurroundTime();
+        if(args is not null)
+        {
+            surroundTime = (int)args;
+        }
         counter = 0;
         npc.aggresive += aggresiveIndex * (1 - Game.Control.HazardLevel > 0 ? (1 - Game.Control.HazardLevel) : 0);
         Randomer rnd = new Randomer();
@@ -75,13 +79,15 @@ public class State_Surround : NPCState
             Vector2 nextDir = new Vector2();
             foreach (var vec in direction)
             {
-                if (Vector2.Angle(toVec, vec) < angle)
+                Vector2Int nextPos= Vector2Int.FloorToInt(npc.transform.position)+Vector2Int.FloorToInt( vec);
+                if (Vector2.Angle(toVec, vec) < angle && Game.Control.mapInfo[nextPos.x,nextPos.y]<100)
                 {
                     angle=Vector2.Angle(toVec, vec);
                     nextDir = vec;
                 }
             }
             nextPos= Vector2Int.FloorToInt(npc.transform.position)+nextDir;
+            Debug.Log($"{npc.transform.name} retreat to {nextPos} ");
         }
         
 
@@ -111,7 +117,7 @@ public class State_Surround : NPCState
         Randomer rnd = new Randomer();
         float choice = rnd.nextFloat();
 
-        if (choice < Game.Control.HazardLevel)//Select the Safe way
+        if (choice >= (Game.Control.HazardLevel + 1) / 2)// Select the Safe way
         {
             if (choice <= Game.Control.HazardLevel / 2)
             {
@@ -139,15 +145,15 @@ public class State_Surround : NPCState
     {
         if (Game.Control.HazardLevel < 0.6f)
         {
-            return 3;
+            return 5;
         }
         else if (Game.Control.HazardLevel<0.8f)
         {
-            return 2;
+            return 3;
         }
         else
         {
-            return 1;
+            return 2;
         }
 
     }

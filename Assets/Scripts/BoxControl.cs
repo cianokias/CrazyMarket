@@ -91,6 +91,7 @@ public class BoxControl : MonoBehaviour
         {
             triggered = true;
             destination += moveDirection * 20;
+            MusicPlayer.player.playAudio("pushing");
         }
 
         transform.position = Vector2.MoveTowards(transform.position, destination, 10 * Time.deltaTime);
@@ -110,8 +111,10 @@ public class BoxControl : MonoBehaviour
     IEnumerator openTheBox()
     {
         destination = new Vector2(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y));
+        MusicPlayer.player.playAudio("boxBreak");
         yield return new WaitForSeconds(0.2f);
         GetComponent<SpriteRenderer>().enabled = false;
+
 
         /*if (isSpecialBox)
         {
@@ -138,8 +141,6 @@ public class BoxControl : MonoBehaviour
             case 4:
                 Instantiate(powerup[1], transform.position, powerup[1].transform.rotation);
                 break;
-
-
         }
 
         yield return new WaitForSeconds(0.2f);
@@ -153,6 +154,7 @@ public class BoxControl : MonoBehaviour
             Game.Control.displayOHT("Time +3s",collision.transform.position);
             Destroy(collision.gameObject);
             killCount++;
+            MusicPlayer.player.playAudio("enemyDie");
             Game.Control.updateScore(100 * killCount);
             Game.Control.timer += 3f;
         }

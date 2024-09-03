@@ -33,13 +33,13 @@ public class Game : MonoBehaviour
     
     [Header("GameObjects")]
     public TMP_Text scoreText;
-    public TMP_Text healthText;
     public TMP_Text timerText;
     public GameObject timerTextGO;
     public TMP_Text itemText;
     public Transform NPCList;
     public GameObject NPC;
     public GameObject door;
+    public GameObject[] HP_icon;
 
     [Header("MapInfo")]
     public int mapHeight;
@@ -92,7 +92,7 @@ public class Game : MonoBehaviour
         updateItem(item >= 3 ? -3 : -item);
 
         player.SetActive(false);
-        timerText.text = "LAST CHANCE";
+        timerText.text = "LAST\nTRY";
         secondLife = true;
         yield return new WaitForSeconds(1.0f);
         player.transform.position = startPoint;
@@ -112,8 +112,8 @@ public class Game : MonoBehaviour
         gamePaused = false;
 
         //init npc
-        Instantiate(NPC, new Vector3(15, 1), NPC.transform.rotation);
-        Instantiate(NPC, new Vector3(1, 13), NPC.transform.rotation);
+        Instantiate(NPC, new Vector3(15, 1), NPC.transform.rotation, NPCList);
+        Instantiate(NPC, new Vector3(1, 13), NPC.transform.rotation, NPCList);
 
         while (!gameOver)//NPC generate timer
         {
@@ -122,11 +122,11 @@ public class Game : MonoBehaviour
             if (npcTimer <= 0)
             {
                 npcTimer = 10;
-                var n= Instantiate(NPC,
+                Instantiate(NPC,
                             new Vector3(player.transform.position.x >= 8 ? 1 : 15,
                                         player.transform.position.y >= 7 ? 1 : 13),
-                            NPC.transform.rotation);
-                n.transform.SetParent(NPCList);
+                            NPC.transform.rotation,
+                            NPCList);
             }
         }
     }
@@ -203,7 +203,7 @@ public class Game : MonoBehaviour
 
     void gameEnd()
     {
-        timerText.text = "GAME OVER";
+        if (timer == 0) timerText.text = "TIME'S\nUP"; else timerText.text = "GAME OVER";
         timerTextGO.GetComponent<Animator>().SetTrigger("end");
         gameOver = true;
         Time.timeScale = 0f;
@@ -239,10 +239,27 @@ public class Game : MonoBehaviour
         scoreText.text = score.ToString("00000");
     }
 
-    public void updateHealth(int healthToAdd)
+    public int updateHealth(int healthToAdd)
     {
-        health += healthToAdd;
-        healthText.text = health.ToString();
+        int addedHealth = 0;
+
+        if (health + healthToAdd <= 4) 
+        {
+            health += healthToAdd; 
+            addedHealth = healthToAdd;
+        }
+        else
+        {
+            addedHealth = 4 - health;
+            health = 4;
+        }
+        
+        for (int i=0; i < 4; i++)
+        {
+            HP_icon[i].SetActive(i < health);
+        }
+
+        return addedHealth;
     }
 
     public void updateItem(int itemToAdd)

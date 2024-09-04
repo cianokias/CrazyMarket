@@ -68,7 +68,11 @@ public class HighScoreSceneControl : MonoBehaviour
 
                 playerNames.text = tempPlayerNames;
                 playerScores.text = tempPlayerScores;
-                if (Game.Control.score <= members[members.Length - 1].score)
+                if (MusicPlayer.player.cheatMode)
+                {
+                    yourScores.text = "Cheat mode active: your score won't count.";
+                }
+                else if (Game.Control.score <= members[members.Length - 1].score)
                 {
                     yourScores.text = "YOUR SCORE: " + Game.Control.score;
                 }
@@ -80,6 +84,7 @@ public class HighScoreSceneControl : MonoBehaviour
             else
             {
                 Debug.Log("Failed to get the leaderboard. " + response.errorData);
+                yourScores.text = "Failed to get the leaderboard.";
                 done = true;
             }
         });

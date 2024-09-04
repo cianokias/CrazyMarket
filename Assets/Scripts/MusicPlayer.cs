@@ -10,6 +10,8 @@ public class MusicPlayer : MonoBehaviour
 
     public AudioClip[] ac;
 
+    public bool cheatMode = false;
+
     void Awake()
     {
         if (player == null)

@@ -40,6 +40,7 @@ public class Game : MonoBehaviour
     public GameObject NPC;
     public GameObject door;
     public GameObject[] HP_icon;
+    public GameObject cheatBackwall;
 
     [Header("MapInfo")]
     public int mapHeight;
@@ -77,6 +78,7 @@ public class Game : MonoBehaviour
     {
         startPoint = player.transform.position;
         StartCoroutine("StartTimer");
+        if (MusicPlayer.player.cheatMode) { cheatBackwall.SetActive(true); }
     }
 
     public void resetPlayer()
@@ -214,6 +216,15 @@ public class Game : MonoBehaviour
 
     IEnumerator SubmitScoreRoutine() // lootlocker submit score
     {
+        if (MusicPlayer.player.cheatMode)
+        {
+            yield return new WaitForSecondsRealtime(3);
+            wait3sec = true;
+            uploadScore = true;
+            timerText.text = "PRESS SPACE";
+            yield break;
+        }
+
         string playerID = PlayerPrefs.GetString("PlayerID");
         LootLockerSDKManager.SubmitScore(playerID, score, leaderboardID, (response) =>
         {

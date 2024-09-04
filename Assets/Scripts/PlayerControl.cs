@@ -18,12 +18,15 @@ public class PlayerControl : MonoBehaviour
     LayerMask boxLayer;        // box layer
 
     //other
-    public  bool canBeHurt = true;
+    public bool canBeHurt = true;
     float speedForOneBlock = 0.2f;
 
     //components
     Animator anim;
     SpriteRenderer sr;
+
+    //cheatMode
+    public GameObject boxPref;
 
     private void Awake()
     {
@@ -42,6 +45,9 @@ public class PlayerControl : MonoBehaviour
 
     void Update()
     {
+        //cheatMode
+        //if (MusicPlayer.player.cheatMode) { canBeHurt = false; }
+
         //move to destination
         transform.position = Vector2.MoveTowards(transform.position, destination, (1 / speedForOneBlock) * Time.deltaTime);
 
@@ -110,6 +116,22 @@ public class PlayerControl : MonoBehaviour
                 BoxControl hitObjectControl = hit.collider.gameObject.GetComponent<BoxControl>();
                 hitObjectControl.isPushed = true;
                 hitObjectControl.moveDirection = faceDirection;
+            }
+
+            if (MusicPlayer.player.cheatMode)
+            {
+                Vector2[] dirc = new Vector2[] { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) };
+                foreach (var dir in dirc)
+                {
+                    RaycastHit2D new_hit = Physics2D.Raycast(transform.position, dir, rayDistance, wallLayer | boxLayer);
+                    if (new_hit.collider == null)
+                    {
+                        BoxControl tempBox = Instantiate(boxPref, (Vector2)transform.position + dir, boxPref.transform.rotation).GetComponent<BoxControl>();
+                        tempBox.isPushed = true;
+                        tempBox.moveDirection = dir;
+                    }
+                }
+                
             }
         }
 

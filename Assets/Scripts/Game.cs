@@ -17,19 +17,35 @@ public class Game : MonoBehaviour
     public bool secondLife = false;
     public bool recovering = false;
     public bool gameOver = false;
+    public bool gamePaused = true;
     public Vector2 startPoint = Vector2.zero;
 
+    [SerializeField]
+    private float _hazardLevel=0.5f;
+    public float HazardLevel // normally should be within [0,1], it will be a hard time when it rises more than 1
+    {
+        get
+        {
+            _hazardLevel = item / 5f + score / 3000f;
+            return _hazardLevel;
+        }
+    }
+    
     [Header("GameObjects")]
     public TMP_Text scoreText;
-    public TMP_Text healthText;
     public TMP_Text timerText;
+    public GameObject timerTextGO;
     public TMP_Text itemText;
+    public Transform NPCList;
     public GameObject NPC;
+    public GameObject door;
+    public GameObject[] HP_icon;
 
     [Header("MapInfo")]
     public int mapHeight;
     public int mapWidth;//Boundary included
     public GameObject objs;
+    int initObjNum;
     public int[,] mapInfo;
 
     [Header("Timer")]
@@ -51,9 +67,9 @@ public class Game : MonoBehaviour
 
         //Setting the map size. Should be manually set if need to auto generate map 
         var bound = GameObject.Find("Boundary");
-        mapHeight =(int) (bound.transform.Find("H UP").GetChild(0).position.y - bound.transform.Find("H Down").GetChild(0).position.y)+1;
-        mapWidth = (int)(bound.transform.Find("V Right").GetChild(0).position.x - bound.transform.Find("V Left").GetChild(0).position.x)+1;
-        mapInfo = new int[mapWidth,mapHeight];
+        mapHeight =(int) (bound.transform.Find("H UP").GetChild(0).position.y - bound.transform.Find("H Down").GetChild(0).position.y)-1;
+        mapWidth = (int)(bound.transform.Find("V Right").GetChild(0).position.x - bound.transform.Find("V Left").GetChild(0).position.x)-1;
+        mapInfo = new int[mapWidth+2,mapHeight+2];
         RefreshMapInfo();
     }
 
@@ -77,7 +93,7 @@ public class Game : MonoBehaviour
         updateItem(item >= 3 ? -3 : -item);
 
         player.SetActive(false);
-        healthText.text = "LAST CHANCE";
+        timerText.text = "LAST\nTRY";
         secondLife = true;
         yield return new WaitForSeconds(1.0f);
         player.transform.position = startPoint;
@@ -89,9 +105,19 @@ public class Game : MonoBehaviour
         updateScore(0);
     }
 
-    IEnumerator StartTimer()
+    IEnumerator StartTimer() 
     {
-        while (!gameOver)
+        yield return new WaitForSeconds(1f);
+        door.GetComponent<Animator>().SetTrigger("open");
+        yield return new WaitForSeconds(2f);
+        gamePaused = false;
+
+        //init npc
+        Instantiate(NPC, new Vector3(15, 1), NPC.transform.rotation, NPCList).name+=Time.time.ToString("0.0");
+        yield return new WaitForSeconds(0.25f);
+        Instantiate(NPC, new Vector3(1, 13), NPC.transform.rotation, NPCList).name += Time.time.ToString("0.0");
+
+        while (!gameOver)//NPC generate timer
         {
             yield return new WaitForSeconds(1.0f);
             npcTimer -= 1;
@@ -101,8 +127,8 @@ public class Game : MonoBehaviour
                 Instantiate(NPC,
                             new Vector3(player.transform.position.x >= 8 ? 1 : 15,
                                         player.transform.position.y >= 7 ? 1 : 13),
-                            NPC.transform.rotation);
-            
+                            NPC.transform.rotation,
+                            NPCList).name += Time.time.ToString("0.0");
             }
         }
     }
@@ -114,8 +140,12 @@ public class Game : MonoBehaviour
         if (!gameOver)
         {
             timer -=  Time.deltaTime;
+            if (!recovering && !gamePaused) timerText.text = timer.ToString("00.000");
+
+            if (timer < 11) timerTextGO.GetComponent<Animator>().SetTrigger("countdown");
+                else timerTextGO.GetComponent<Animator>().SetTrigger("normal");
+
             if (timer <= 0) { timer = 0; gameEnd(); }
-            timerText.text = timer.ToString("00.000");
         }
 
         if (gameOver && uploadScore && wait3sec)
@@ -129,12 +159,12 @@ public class Game : MonoBehaviour
 
     }
 
-    void RefreshMapInfo()
+    public void RefreshMapInfo()
     {
         //Reset MapInfo
-        for (int i = 0; i < mapHeight; i++) 
+        for (int i = 0; i <= mapHeight; i++) 
         {
-            for (int j = 0; j < mapWidth; j++)
+            for (int j = 0; j <= mapWidth; j++)
             {
                 mapInfo[j, i] = 0;
             }
@@ -150,7 +180,7 @@ public class Game : MonoBehaviour
             }
             
         }
-
+        //Add the Objs
         var objs = GameObject.Find("Objects").transform;
         for (int i = 0; i < objs.childCount; i++)
         {
@@ -162,15 +192,21 @@ public class Game : MonoBehaviour
             else if (objs.GetChild(i).tag == "Pickup")
             {
                 mapInfo[x, y] = 0;
-            }
-            
+            }            
         }
-
+        //Add the npcs
+        var npcs = GameObject.Find("NPC List").transform;
+        for (int i = 0; i < npcs.childCount; i++)
+        {
+            int x = (int)(npcs.GetChild(i).transform.position.x+0.5f), y = (int)(npcs.GetChild(i).transform.position.y+0.5f);
+            mapInfo[(int)x, (int)y] = 10;
+        }
     }
 
     void gameEnd()
     {
-        healthText.text = "GAME OVER";
+        if (timer == 0) timerText.text = "TIME'S\nUP"; else timerText.text = "GAME OVER";
+        timerTextGO.GetComponent<Animator>().SetTrigger("end");
         gameOver = true;
         Time.timeScale = 0f;
         StartCoroutine("SubmitScoreRoutine");
@@ -196,31 +232,49 @@ public class Game : MonoBehaviour
         yield return new WaitWhile(() => uploadScore == false);
         yield return new WaitForSecondsRealtime(3);
         wait3sec = true;
+        timerText.text = "PRESS SPACE";
     }
 
     public void updateScore(int scoreToAdd)
     { 
         score += scoreToAdd;
-        scoreText.text = "SCORE " + score.ToString("00000");
+        scoreText.text = score.ToString("00000");
     }
 
-    public void updateHealth(int healthToAdd)
+    public int updateHealth(int healthToAdd)
     {
-        health += healthToAdd;
-        healthText.text = "HP " + health.ToString();
+        int addedHealth = 0;
+
+        if (health + healthToAdd <= 4) 
+        {
+            health += healthToAdd; 
+            addedHealth = healthToAdd;
+        }
+        else
+        {
+            addedHealth = 4 - health;
+            health = 4;
+        }
+        
+        for (int i=0; i < 4; i++)
+        {
+            HP_icon[i].SetActive(i < health);
+        }
+
+        return addedHealth;
     }
 
     public void updateItem(int itemToAdd)
     {
         item += itemToAdd;
-        itemText.text = "Item " + item.ToString("00");
+        itemText.text = item.ToString("00");
     }
 
     public void displayOHT(string textToDisplay, Vector3 targetPosition)
     {
-        Vector3 position = Camera.main.WorldToScreenPoint(targetPosition);
+        //Vector3 position = Camera.main.WorldToScreenPoint(targetPosition);
         OverHeadText newOHT = Instantiate(ohtPrefeb, canvas.transform).GetComponent<OverHeadText>();
         newOHT.tmpText.text = textToDisplay;
-        newOHT.screenPosition = position;
+        newOHT.screenPosition = targetPosition;
     }
 }

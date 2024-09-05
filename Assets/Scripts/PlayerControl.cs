@@ -7,7 +7,7 @@ public class PlayerControl : MonoBehaviour
 {
     //Movement vars
     Vector2 destination = new Vector2(0,0);
-    Vector2 moveDirection = new Vector2(0,0);
+    public Vector2 moveDirection = new Vector2(0,0);
     Vector2 faceDirection = new Vector2(0, 0);
     bool canMove = true;
     bool isMoving = false;
@@ -18,7 +18,7 @@ public class PlayerControl : MonoBehaviour
     LayerMask boxLayer;        // box layer
 
     //other
-    bool canBeHurt = true;
+    public  bool canBeHurt = true;
     float speedForOneBlock = 0.2f;
 
     //components
@@ -54,7 +54,7 @@ public class PlayerControl : MonoBehaviour
         sr.sortingOrder = (14 - (int)transform.position.y) * 2 + 1;
         
         //move logic
-        if (canMove && !isMoving && !Game.Control.recovering)
+        if (canMove && !isMoving && !Game.Control.recovering && !Game.Control.gamePaused)
         {
             moveDirection = Vector2.zero;
 
@@ -138,13 +138,15 @@ public class PlayerControl : MonoBehaviour
         if (collision.gameObject.tag == "Checkout")
         {
             int tempItem = Game.Control.item;
-            if (tempItem >= 0)
+            if (tempItem > 0)
             {
                 Game.Control.updateItem(-tempItem);
                 Game.Control.updateScore(tempItem * 100);
 
                 StartCoroutine(anotherOHT("Score +" + tempItem * 100, pos, 1.5f));
                 StartCoroutine(anotherOHT("Item -" + tempItem, pos, 1f));
+
+                MusicPlayer.player.playAudio("checkout");
 
                 //Game.Control.timer += 0.3f * tempItem * (1 + 0.07f * (tempItem - 1));
                 //Game.Control.timer += 0.3f * tempItem * 1.7f;
@@ -157,6 +159,8 @@ public class PlayerControl : MonoBehaviour
 
             Game.Control.updateItem(1);
             Game.Control.displayOHT("Item +1", pos);
+
+            MusicPlayer.player.playAudio("collect");
         }
 
         if (collision.gameObject.tag == "PowerUp")
@@ -169,6 +173,8 @@ public class PlayerControl : MonoBehaviour
 
             StartCoroutine(cannotBeHurt(8f));
             StartCoroutine(speedBoost(8f));
+
+            MusicPlayer.player.playAudio("powerUp");
         }
 
         if (collision.gameObject.tag == "PowerUpHP")
@@ -177,8 +183,10 @@ public class PlayerControl : MonoBehaviour
 
             Game.Control.updateScore(200);
             Game.Control.displayOHT("Score +200", pos);
-            Game.Control.updateHealth(1);
-            StartCoroutine(anotherOHT("HP +1", pos, 0.5f));
+            int t = Game.Control.updateHealth(1);
+            if (t == 1) StartCoroutine(anotherOHT("HP +1", pos, 0.5f));
+
+            MusicPlayer.player.playAudio("powerUp");
         }
 
         if (collision.gameObject.tag == "NPC")

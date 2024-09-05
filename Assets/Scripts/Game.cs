@@ -95,7 +95,7 @@ public class Game : MonoBehaviour
         updateItem(item >= 3 ? -3 : -item);
 
         player.SetActive(false);
-        timerText.text = "LAST\nTRY";
+        timerText.text = "<align=\"center\">LAST\nTRY";
         secondLife = true;
         yield return new WaitForSeconds(1.0f);
         player.transform.position = startPoint;
@@ -207,7 +207,7 @@ public class Game : MonoBehaviour
 
     void gameEnd()
     {
-        if (timer == 0) timerText.text = "TIME'S\nUP"; else timerText.text = "GAME OVER";
+        if (timer == 0) timerText.text = "<align=\"center\">TIME'S\nUP"; else timerText.text = "<align=\"center\">GAME\nOVER";
         timerTextGO.GetComponent<Animator>().SetTrigger("end");
         gameOver = true;
         Time.timeScale = 0f;
@@ -221,7 +221,7 @@ public class Game : MonoBehaviour
             yield return new WaitForSecondsRealtime(3);
             wait3sec = true;
             uploadScore = true;
-            timerText.text = "PRESS SPACE";
+            timerText.text = "<align=\"center\">PRESS\nSPACE";
             yield break;
         }
 
@@ -243,7 +243,7 @@ public class Game : MonoBehaviour
         yield return new WaitWhile(() => uploadScore == false);
         yield return new WaitForSecondsRealtime(3);
         wait3sec = true;
-        timerText.text = "PRESS SPACE";
+        timerText.text = "<align=\"center\">PRESS\nSPACE";
     }
 
     public void updateScore(int scoreToAdd)
